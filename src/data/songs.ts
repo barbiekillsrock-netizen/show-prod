@@ -5,6 +5,8 @@ export type Song = {
   title: string;
   artist: string;
   key: string;
+  pdfUrl?: string;
+  pdfName?: string;
 };
 
 const initialSongs: Song[] = [
