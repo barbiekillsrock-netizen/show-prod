@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
+import PdfView from "@/components/PdfView";
 
-const PdfView = lazy(() => import("@/components/PdfView"));
+
 
 
 type Point = { x: number; y: number };
@@ -359,20 +360,12 @@ function PerformancePage() {
             className="relative"
             style={{ width: fitSize.width, height: fitSize.height }}
           >
-            <Suspense
-              fallback={
-                <div className="text-muted-foreground text-base p-6">
-                  Carregando cifra...
-                </div>
-              }
-            >
-              <PdfView
-                file={pdfUrl}
-                width={fitSize.width}
-                height={fitSize.height}
-                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
-              />
-            </Suspense>
+            <PdfView
+              file={pdfUrl}
+              width={fitSize.width}
+              height={fitSize.height}
+              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+            />
 
             {/* Canvas overlay */}
             <canvas
@@ -394,14 +387,12 @@ function PerformancePage() {
         {/* Initial PDF dimension probe (off-screen first-load fallback) */}
         {pdfUrl && !fitSize && (
           <div className="hidden">
-            <Suspense fallback={null}>
-              <PdfView
-                file={pdfUrl}
-                width={400}
-                height={560}
-                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
-              />
-            </Suspense>
+            <PdfView
+              file={pdfUrl}
+              width={400}
+              height={560}
+              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+            />
           </div>
         )}
 
