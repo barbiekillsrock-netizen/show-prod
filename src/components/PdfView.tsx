@@ -2,6 +2,23 @@ import { useEffect, useRef, useState } from "react";
 
 let pdfWorkerSrc: string | null = null;
 
+// Preload pdfjs module as soon as this file is imported (client only)
+let pdfjsPromise: Promise<typeof import("pdfjs-dist/legacy/build/pdf.mjs")> | null = null;
+function loadPdfjs() {
+  if (typeof window === "undefined") return Promise.reject(new Error("ssr"));
+  if (!pdfjsPromise) {
+    pdfjsPromise = import("pdfjs-dist/legacy/build/pdf.mjs");
+  }
+  return pdfjsPromise;
+}
+if (typeof window !== "undefined") {
+  // kick off the import early
+  loadPdfjs().catch(() => {});
+}
+
+// Cache loaded PDF documents by file URL to avoid reloading on resize
+const docCache = new Map<string, Promise<import("pdfjs-dist/legacy/build/pdf.mjs").PDFDocumentProxy>>();
+
 type Props = {
   file: string;
   width: number;
