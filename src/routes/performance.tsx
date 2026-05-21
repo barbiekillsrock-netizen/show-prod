@@ -49,6 +49,10 @@ function PerformancePage() {
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(null);
 
+  const handlePdfLoadSuccess = useCallback((d: { w: number; h: number }) => {
+    setPdfDims((prev) => (prev && prev.w === d.w && prev.h === d.h ? prev : d));
+  }, []);
+
   // Touch swipe state
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const drawingRef = useRef(false);
@@ -364,7 +368,7 @@ function PerformancePage() {
               file={pdfUrl}
               width={fitSize.width}
               height={fitSize.height}
-              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+              onLoadSuccess={handlePdfLoadSuccess}
             />
 
             {/* Canvas overlay */}
@@ -391,7 +395,7 @@ function PerformancePage() {
               file={pdfUrl}
               width={400}
               height={560}
-              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+              onLoadSuccess={handlePdfLoadSuccess}
             />
           </div>
         )}
