@@ -1,19 +1,11 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { Document, Page, pdfjs } from "react-pdf";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { songs as allSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
 
-// pdf.js worker
-if (typeof window !== "undefined") {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
-}
+const PdfView = lazy(() => import("@/components/PdfView"));
+
 
 type Point = { x: number; y: number };
 type Stroke = { tool: "pen"; color: string; width: number; points: Point[] };
@@ -365,36 +357,30 @@ function PerformancePage() {
             className="relative"
             style={{ width: fitSize.width, height: fitSize.height }}
           >
-            <Document
-              file={pdfUrl}
-              loading={
+            <Suspense
+              fallback={
                 <div className="text-muted-foreground text-base p-6">
                   Carregando cifra...
                 </div>
               }
-              error={
-                <div className="text-destructive text-base p-6">
-                  Não foi possível abrir o PDF.
-                </div>
-              }
             >
-              <Page
-                pageNumber={1}
+              <PdfView
+                file={pdfUrl}
                 width={fitSize.width}
                 height={fitSize.height}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                onLoadSuccess={(p) => {
-                  setPdfDims({ w: p.originalWidth, h: p.originalHeight });
-                }}
+                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
               />
-            </Document>
+            </Suspense>
 
             {/* Canvas overlay */}
             <canvas
               ref={canvasRef}
               className="absolute inset-0 touch-none"
-              style={{ width: fitSize.width, height: fitSize.height, cursor: tool === "eraser" ? "cell" : "crosshair" }}
+              style={{
+                width: fitSize.width,
+                height: fitSize.height,
+                cursor: tool === "eraser" ? "cell" : "crosshair",
+              }}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
@@ -406,17 +392,17 @@ function PerformancePage() {
         {/* Initial PDF dimension probe (off-screen first-load fallback) */}
         {pdfUrl && !fitSize && (
           <div className="hidden">
-            <Document file={pdfUrl}>
-              <Page
-                pageNumber={1}
+            <Suspense fallback={null}>
+              <PdfView
+                file={pdfUrl}
                 width={400}
-                onLoadSuccess={(p) =>
-                  setPdfDims({ w: p.originalWidth, h: p.originalHeight })
-                }
+                height={560}
+                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
               />
-            </Document>
+            </Suspense>
           </div>
         )}
+
       </div>
 
       {/* Invisible side tap/swipe zones */}
