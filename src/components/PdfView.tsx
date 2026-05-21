@@ -2,6 +2,23 @@ import { useEffect, useRef, useState } from "react";
 
 let pdfWorkerSrc: string | null = null;
 
+// Preload pdfjs module as soon as this file is imported (client only)
+let pdfjsPromise: Promise<typeof import("pdfjs-dist/legacy/build/pdf.mjs")> | null = null;
+function loadPdfjs() {
+  if (typeof window === "undefined") return Promise.reject(new Error("ssr"));
+  if (!pdfjsPromise) {
+    pdfjsPromise = import("pdfjs-dist/legacy/build/pdf.mjs");
+  }
+  return pdfjsPromise;
+}
+if (typeof window !== "undefined") {
+  // kick off the import early
+  loadPdfjs().catch(() => {});
+}
+
+// Cache loaded PDF documents by file URL to avoid reloading on resize
+const docCache = new Map<string, Promise<import("pdfjs-dist/legacy/build/pdf.mjs").PDFDocumentProxy>>();
+
 type Props = {
   file: string;
   width: number;
@@ -25,7 +42,7 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
         if (!canvas) return;
 
         setError(false);
-        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+        const pdfjs = await loadPdfjs();
 
         if (!pdfWorkerSrc) {
           pdfWorkerSrc = new URL(
@@ -35,7 +52,12 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
         }
         pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
-        const pdf = await pdfjs.getDocument(file).promise;
+        let docPromise = docCache.get(file);
+        if (!docPromise) {
+          docPromise = pdfjs.getDocument(file).promise;
+          docCache.set(file, docPromise);
+        }
+        const pdf = await docPromise;
         if (cancelled) return;
 
         const page = await pdf.getPage(1);

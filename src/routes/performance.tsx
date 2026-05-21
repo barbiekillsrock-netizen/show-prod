@@ -39,7 +39,7 @@ function PerformancePage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
 
-  const [tool, setTool] = useState<"pen" | "eraser">("pen");
+  const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
   const [color, setColor] = useState<string>("#00E5FF");
   const [drawings, setDrawings] = useState<DrawingMap>({});
 
@@ -299,7 +299,7 @@ function PerformancePage() {
           {/* Tool: Pen */}
           <button
             type="button"
-            onClick={() => setTool("pen")}
+            onClick={() => setTool((t) => (t === "pen" ? null : "pen"))}
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "pen"
                 ? "bg-primary text-primary-foreground border-primary"
@@ -311,25 +311,27 @@ function PerformancePage() {
             <Pen className="h-5 w-5" />
           </button>
 
-          {/* Color toggle */}
-          <button
-            type="button"
-            onClick={() => setColor((c) => (c === "#00E5FF" ? "#FF0055" : "#00E5FF"))}
-            className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-border bg-card/70 backdrop-blur hover:bg-card relative"
-            aria-label="Trocar cor da caneta"
-            title="Trocar cor"
-          >
-            <Palette className="h-5 w-5 text-foreground" />
-            <span
-              className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-background"
-              style={{ backgroundColor: color }}
-            />
-          </button>
+          {/* Color toggle - only when a tool is active */}
+          {tool !== null && (
+            <button
+              type="button"
+              onClick={() => setColor((c) => (c === "#00E5FF" ? "#FF0055" : "#00E5FF"))}
+              className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-border bg-card/70 backdrop-blur hover:bg-card relative"
+              aria-label="Trocar cor da caneta"
+              title="Trocar cor"
+            >
+              <Palette className="h-5 w-5 text-foreground" />
+              <span
+                className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-background"
+                style={{ backgroundColor: color }}
+              />
+            </button>
+          )}
 
           {/* Tool: Eraser */}
           <button
             type="button"
-            onClick={() => setTool("eraser")}
+            onClick={() => setTool((t) => (t === "eraser" ? null : "eraser"))}
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "eraser"
                 ? "bg-primary text-primary-foreground border-primary"
@@ -351,6 +353,18 @@ function PerformancePage() {
             <Trash2 className="h-4 w-4" />
             <span className="text-sm font-medium">Limpar Traços</span>
           </button>
+
+          {/* Save - only when a tool is active */}
+          {tool !== null && (
+            <button
+              type="button"
+              onClick={() => setTool(null)}
+              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+              title="Salvar edição"
+            >
+              <span className="text-sm font-semibold">Salvar</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -359,46 +373,49 @@ function PerformancePage() {
         ref={stageRef}
         className="absolute inset-0 flex items-center justify-center bg-black"
       >
-        {pdfUrl && fitSize && (
+        {pdfUrl && stageSize.width > 0 && stageSize.height > 0 && (
           <div
             className="relative"
-            style={{ width: fitSize.width, height: fitSize.height }}
+            style={{
+              width: fitSize?.width ?? stageSize.width,
+              height: fitSize?.height ?? stageSize.height,
+            }}
           >
             <PdfView
               file={pdfUrl}
-              width={fitSize.width}
-              height={fitSize.height}
+              width={fitSize?.width ?? stageSize.width}
+              height={fitSize?.height ?? stageSize.height}
               onLoadSuccess={handlePdfLoadSuccess}
             />
 
-            {/* Canvas overlay */}
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 touch-none"
-              style={{
-                width: fitSize.width,
-                height: fitSize.height,
-                cursor: tool === "eraser" ? "cell" : "crosshair",
-              }}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-            />
+            {/* Canvas overlay - only active when a tool is selected */}
+            {fitSize && tool !== null && (
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 touch-none"
+                style={{
+                  width: fitSize.width,
+                  height: fitSize.height,
+                  cursor: tool === "eraser" ? "cell" : "crosshair",
+                }}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
+              />
+            )}
+
+            {/* Render strokes (read-only) when not editing */}
+            {fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && (
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 pointer-events-none"
+                style={{ width: fitSize.width, height: fitSize.height }}
+              />
+            )}
           </div>
         )}
 
-        {/* Initial PDF dimension probe (off-screen first-load fallback) */}
-        {pdfUrl && !fitSize && (
-          <div className="hidden">
-            <PdfView
-              file={pdfUrl}
-              width={400}
-              height={560}
-              onLoadSuccess={handlePdfLoadSuccess}
-            />
-          </div>
-        )}
 
       </div>
 
