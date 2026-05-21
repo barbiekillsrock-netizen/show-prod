@@ -32,9 +32,9 @@ function PerformancePage() {
   const navigate = useNavigate();
 
   const setlist: Song[] = useMemo(() => {
-    const idList = ids.split(",").filter(Boolean);
+    const idList: string[] = ids.split(",").filter(Boolean);
     return idList
-      .map((id) => allSongs.find((s) => s.id === id))
+      .map((id: string) => allSongs.find((s: Song) => s.id === id))
       .filter((s): s is Song => Boolean(s));
   }, [ids]);
 
