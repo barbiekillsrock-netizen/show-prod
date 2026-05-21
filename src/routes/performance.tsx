@@ -373,46 +373,49 @@ function PerformancePage() {
         ref={stageRef}
         className="absolute inset-0 flex items-center justify-center bg-black"
       >
-        {pdfUrl && fitSize && (
+        {pdfUrl && stageSize.width > 0 && stageSize.height > 0 && (
           <div
             className="relative"
-            style={{ width: fitSize.width, height: fitSize.height }}
+            style={{
+              width: fitSize?.width ?? stageSize.width,
+              height: fitSize?.height ?? stageSize.height,
+            }}
           >
             <PdfView
               file={pdfUrl}
-              width={fitSize.width}
-              height={fitSize.height}
+              width={fitSize?.width ?? stageSize.width}
+              height={fitSize?.height ?? stageSize.height}
               onLoadSuccess={handlePdfLoadSuccess}
             />
 
-            {/* Canvas overlay */}
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 touch-none"
-              style={{
-                width: fitSize.width,
-                height: fitSize.height,
-                cursor: tool === "eraser" ? "cell" : "crosshair",
-              }}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-            />
+            {/* Canvas overlay - only active when a tool is selected */}
+            {fitSize && tool !== null && (
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 touch-none"
+                style={{
+                  width: fitSize.width,
+                  height: fitSize.height,
+                  cursor: tool === "eraser" ? "cell" : "crosshair",
+                }}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
+              />
+            )}
+
+            {/* Render strokes (read-only) when not editing */}
+            {fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && (
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 pointer-events-none"
+                style={{ width: fitSize.width, height: fitSize.height }}
+              />
+            )}
           </div>
         )}
 
-        {/* Initial PDF dimension probe (off-screen first-load fallback) */}
-        {pdfUrl && !fitSize && (
-          <div className="hidden">
-            <PdfView
-              file={pdfUrl}
-              width={400}
-              height={560}
-              onLoadSuccess={handlePdfLoadSuccess}
-            />
-          </div>
-        )}
 
       </div>
 
