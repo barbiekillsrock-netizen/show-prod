@@ -24,12 +24,13 @@ function PerformancePage() {
   const { ids, name } = useSearch({ from: "/performance" });
   const navigate = useNavigate();
 
+  const allSongs = useSongs();
   const setlist: Song[] = useMemo(() => {
     const idList: string[] = ids.split(",").filter(Boolean);
     return idList
       .map((id: string) => allSongs.find((s: Song) => s.id === id))
       .filter((s): s is Song => Boolean(s));
-  }, [ids]);
+  }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
