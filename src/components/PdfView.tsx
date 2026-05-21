@@ -26,18 +26,33 @@ type Props = {
   onLoadSuccess: (dims: { w: number; h: number }) => void;
 };
 
+type PdfRenderTask = {
+  cancel: () => void;
+  promise: Promise<unknown>;
+};
+
 export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const renderTaskRef = useRef<PdfRenderTask | null>(null);
+  const renderRunRef = useRef(0);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     let cancelled = false;
+    const runId = ++renderRunRef.current;
     if (!canvasRef.current || width <= 0 || height <= 0) return;
 
     async function renderPdf() {
       try {
+        const previousTask = renderTaskRef.current;
+        if (previousTask) {
+          previousTask.cancel();
+          await previousTask.promise.catch(() => undefined);
+        }
+        if (cancelled || runId !== renderRunRef.current) return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -79,8 +94,12 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, viewport.width, viewport.height);
-        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+        const renderTask = page.render({ canvas, canvasContext: ctx, viewport });
+        renderTaskRef.current = renderTask;
+        await renderTask.promise;
+        if (renderTaskRef.current === renderTask) renderTaskRef.current = null;
       } catch (err) {
+        if (err instanceof Error && err.name === "RenderingCancelledException") return;
         console.error(err);
         if (!cancelled) setError(true);
       }
@@ -90,6 +109,7 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
 
     return () => {
       cancelled = true;
+      renderTaskRef.current?.cancel();
     };
   }, [file, height, onLoadSuccess, width]);
 
