@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 export type Song = {
   id: string;
   title: string;
@@ -5,7 +7,7 @@ export type Song = {
   key: string;
 };
 
-export const songs: Song[] = [
+const initialSongs: Song[] = [
   { id: "1", title: "Wish You Were Here", artist: "Pink Floyd", key: "G" },
   { id: "2", title: "Tempo Perdido", artist: "Legião Urbana", key: "D" },
   { id: "3", title: "Garota de Ipanema", artist: "Tom Jobim", key: "F" },
@@ -19,3 +21,37 @@ export const songs: Song[] = [
   { id: "11", title: "Eduardo e Mônica", artist: "Legião Urbana", key: "G#" },
   { id: "12", title: "Sunday Bloody Sunday", artist: "U2", key: "D" },
 ];
+
+let state: Song[] = initialSongs;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const l of listeners) l();
+}
+
+export const songsStore = {
+  get: () => state,
+  subscribe(l: () => void) {
+    listeners.add(l);
+    return () => listeners.delete(l);
+  },
+  add(song: Omit<Song, "id">) {
+    const id =
+      (typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2)) + "";
+    state = [{ id, ...song }, ...state];
+    emit();
+  },
+};
+
+export function useSongs(): Song[] {
+  return useSyncExternalStore(
+    songsStore.subscribe,
+    songsStore.get,
+    songsStore.get,
+  );
+}
+
+// Back-compat export (kept so older imports keep working).
+export const songs = initialSongs;
