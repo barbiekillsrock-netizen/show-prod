@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
-import { songs as allSongs, type Song } from "@/data/songs";
+import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 
 const PdfView = lazy(() => import("@/components/PdfView"));
@@ -24,12 +24,13 @@ function PerformancePage() {
   const { ids, name } = useSearch({ from: "/performance" });
   const navigate = useNavigate();
 
+  const allSongs = useSongs();
   const setlist: Song[] = useMemo(() => {
     const idList: string[] = ids.split(",").filter(Boolean);
     return idList
       .map((id: string) => allSongs.find((s: Song) => s.id === id))
       .filter((s): s is Song => Boolean(s));
-  }, [ids]);
+  }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
