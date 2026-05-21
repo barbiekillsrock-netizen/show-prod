@@ -49,6 +49,10 @@ function PerformancePage() {
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(null);
 
+  const handlePdfLoadSuccess = useCallback((d: { w: number; h: number }) => {
+    setPdfDims((prev) => (prev && prev.w === d.w && prev.h === d.h ? prev : d));
+  }, []);
+
   // Touch swipe state
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const drawingRef = useRef(false);
