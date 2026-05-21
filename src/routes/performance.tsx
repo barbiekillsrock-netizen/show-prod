@@ -368,7 +368,7 @@ function PerformancePage() {
               file={pdfUrl}
               width={fitSize.width}
               height={fitSize.height}
-              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+              onLoadSuccess={handlePdfLoadSuccess}
             />
 
             {/* Canvas overlay */}
@@ -395,7 +395,7 @@ function PerformancePage() {
               file={pdfUrl}
               width={400}
               height={560}
-              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+              onLoadSuccess={handlePdfLoadSuccess}
             />
           </div>
         )}
