@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from "react";
-import { X } from "lucide-react";
+import { useRef, useState, type FormEvent } from "react";
+import { X, FileText, Upload, Trash2 } from "lucide-react";
 import { songsStore } from "@/data/songs";
 
 export function AddSongDialog({
@@ -12,6 +12,9 @@ export function AddSongDialog({
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [songKey, setSongKey] = useState("");
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
 
@@ -19,15 +22,28 @@ export function AddSongDialog({
     setTitle("");
     setArtist("");
     setSongKey("");
+    setPdfFile(null);
+  }
+
+  function handlePick(file: File | null | undefined) {
+    if (!file) return;
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      alert("Por favor, selecione um arquivo PDF.");
+      return;
+    }
+    setPdfFile(file);
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!title.trim() || !artist.trim() || !songKey.trim()) return;
+    const pdfUrl = pdfFile ? URL.createObjectURL(pdfFile) : undefined;
     songsStore.add({
       title: title.trim(),
       artist: artist.trim(),
       key: songKey.trim(),
+      pdfUrl,
+      pdfName: pdfFile?.name,
     });
     reset();
     onClose();
@@ -39,7 +55,7 @@ export function AddSongDialog({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-card border border-border rounded-2xl p-6 shadow-2xl"
+        className="w-full max-w-lg bg-card border border-border rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-5">
@@ -98,6 +114,73 @@ export function AddSongDialog({
               className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={4}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Arquivo PDF da cifra{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
+            </label>
+
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/pdf,.pdf"
+              className="hidden"
+              onChange={(e) => handlePick(e.target.files?.[0])}
+            />
+
+            {pdfFile ? (
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-background">
+                <div className="p-2 rounded-md bg-primary/10 text-primary">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {pdfFile.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(pdfFile.size / 1024).toFixed(0)} KB
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPdfFile(null)}
+                  className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-destructive min-h-[48px] min-w-[48px] flex items-center justify-center"
+                  aria-label="Remover PDF"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                  handlePick(e.dataTransfer.files?.[0]);
+                }}
+                className={`w-full flex flex-col items-center justify-center gap-2 px-4 py-6 rounded-lg border-2 border-dashed transition-colors min-h-[48px] ${
+                  dragOver
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-background hover:border-primary/60 hover:bg-muted/40"
+                }`}
+              >
+                <Upload className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm text-foreground font-medium">
+                  Clique para selecionar ou arraste o PDF
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Sem PDF, usamos uma cifra de demonstração
+                </span>
+              </button>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

@@ -31,6 +31,7 @@ const SAMPLES: Record<string, { intro: string; verse: string[]; chorus: string[]
 const blobCache = new Map<string, string>();
 
 export function getSongPdfUrl(song: Song): string {
+  if (song.pdfUrl) return song.pdfUrl;
   const cached = blobCache.get(song.id);
   if (cached) return cached;
 
