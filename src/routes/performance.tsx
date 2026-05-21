@@ -1,19 +1,11 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { Document, Page, pdfjs } from "react-pdf";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { songs as allSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
 
-// pdf.js worker
-if (typeof window !== "undefined") {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
-}
+const PdfView = lazy(() => import("@/components/PdfView"));
+
 
 type Point = { x: number; y: number };
 type Stroke = { tool: "pen"; color: string; width: number; points: Point[] };
