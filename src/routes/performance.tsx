@@ -12,6 +12,7 @@ type Stroke = { tool: "pen"; color: string; width: number; points: Point[] };
 type DrawingMap = Record<string, Stroke[]>;
 
 export const Route = createFileRoute("/performance")({
+  ssr: false,
   validateSearch: (search: Record<string, unknown>) => ({
     ids: typeof search.ids === "string" ? search.ids : "",
     name: typeof search.name === "string" ? search.name : "Show",
