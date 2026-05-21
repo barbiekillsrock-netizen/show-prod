@@ -20,7 +20,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Search, GripVertical, Calendar, Clock, Music2, X, Play } from "lucide-react";
-import { songs as allSongs, type Song } from "@/data/songs";
+import { useSongs, type Song } from "@/data/songs";
 
 export const Route = createFileRoute("/setlists")({
   component: SetlistsPage,
