@@ -24,7 +24,6 @@ export const Route = createFileRoute("/performance")({
 function PerformancePage() {
   const { ids, name } = useSearch({ from: "/performance" });
   const navigate = useNavigate();
-  const PdfView = usePdfView();
 
   const allSongs = useSongs();
   const setlist: Song[] = useMemo(() => {
