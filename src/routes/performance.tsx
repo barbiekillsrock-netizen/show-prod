@@ -355,25 +355,17 @@ function PerformancePage() {
         ref={stageRef}
         className="absolute inset-0 flex items-center justify-center bg-black"
       >
-        {pdfUrl && fitSize && PdfView && (
+        {pdfUrl && fitSize && (
           <div
             className="relative"
             style={{ width: fitSize.width, height: fitSize.height }}
           >
-            <Suspense
-              fallback={
-                <div className="text-muted-foreground text-base p-6">
-                  Carregando cifra...
-                </div>
-              }
-            >
-              <PdfView
-                file={pdfUrl}
-                width={fitSize.width}
-                height={fitSize.height}
-                onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
-              />
-            </Suspense>
+            <PdfView
+              file={pdfUrl}
+              width={fitSize.width}
+              height={fitSize.height}
+              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+            />
 
             {/* Canvas overlay */}
             <canvas
@@ -393,16 +385,14 @@ function PerformancePage() {
         )}
 
         {/* Initial PDF dimension probe (off-screen first-load fallback) */}
-        {pdfUrl && !fitSize && PdfView && (
+        {pdfUrl && !fitSize && (
           <div className="hidden">
-            <Suspense fallback={null}>
-              <PdfView
-                file={pdfUrl}
-                width={400}
-                height={560}
-                onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
-              />
-            </Suspense>
+            <PdfView
+              file={pdfUrl}
+              width={400}
+              height={560}
+              onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
+            />
           </div>
         )}
 
