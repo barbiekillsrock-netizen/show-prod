@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   DndContext,
@@ -19,7 +19,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Search, GripVertical, Calendar, Clock, Music2, X } from "lucide-react";
+import { Search, GripVertical, Calendar, Clock, Music2, X, Play } from "lucide-react";
 import { songs as allSongs, type Song } from "@/data/songs";
 
 export const Route = createFileRoute("/setlists")({
@@ -261,14 +261,37 @@ function SetlistsPage() {
     setSetlist((prev) => prev.filter((s) => s.id !== id));
   }
 
+  const navigate = useNavigate();
+  const showName = "Show de Sábado — Corporativo";
+
+  function startShow() {
+    if (setlist.length === 0) return;
+    navigate({
+      to: "/performance",
+      search: { ids: setlist.map((s) => s.id).join(","), name: showName },
+    });
+  }
+
   return (
     <div className="p-8 lg:p-10 h-screen flex flex-col">
-      <header className="mb-6 shrink-0">
-        <h2 className="text-3xl font-bold text-foreground">Setlists de Shows</h2>
-        <p className="mt-1 text-base text-muted-foreground">
-          Arraste músicas do repertório para montar o roteiro.
-        </p>
+      <header className="mb-6 shrink-0 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold text-foreground">Setlists de Shows</h2>
+          <p className="mt-1 text-base text-muted-foreground">
+            Arraste músicas do repertório para montar o roteiro.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={startShow}
+          disabled={setlist.length === 0}
+          className="inline-flex items-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+        >
+          <Play className="h-5 w-5 fill-current" />
+          Iniciar Show
+        </button>
       </header>
+
 
       <DndContext
         sensors={sensors}
