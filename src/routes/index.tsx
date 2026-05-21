@@ -1,15 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { Search, Plus } from "lucide-react";
-import { songs } from "@/data/songs";
+import { useSongs } from "@/data/songs";
 import { SongCard } from "@/components/SongCard";
+import { AddSongDialog } from "@/components/AddSongDialog";
 
 export const Route = createFileRoute("/")({
   component: SongsPage,
 });
 
 function SongsPage() {
+  const songs = useSongs();
   const [query, setQuery] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -20,7 +23,7 @@ function SongsPage() {
         s.artist.toLowerCase().includes(q) ||
         s.key.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, songs]);
 
   return (
     <div className="p-8 lg:p-10">
@@ -45,6 +48,7 @@ function SongsPage() {
 
         <button
           type="button"
+          onClick={() => setAddOpen(true)}
           className="inline-flex items-center justify-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity min-h-[48px]"
         >
           <Plus className="h-5 w-5" strokeWidth={3} />
@@ -63,6 +67,8 @@ function SongsPage() {
           ))}
         </div>
       )}
+
+      <AddSongDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
   );
 }
