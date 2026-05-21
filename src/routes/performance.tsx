@@ -38,6 +38,9 @@ function PerformancePage() {
       .filter((s): s is Song => Boolean(s));
   }, [ids]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
 
@@ -73,8 +76,8 @@ function PerformancePage() {
   }, []);
 
   const pdfUrl = useMemo(
-    () => (activeSong ? getSongPdfUrl(activeSong) : null),
-    [activeSong],
+    () => (mounted && activeSong ? getSongPdfUrl(activeSong) : null),
+    [mounted, activeSong],
   );
 
   // Compute PDF render size (object-contain)
