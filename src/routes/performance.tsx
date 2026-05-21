@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
-import { songs as allSongs, type Song } from "@/data/songs";
+import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 
 const PdfView = lazy(() => import("@/components/PdfView"));
