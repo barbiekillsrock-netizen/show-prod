@@ -375,7 +375,7 @@ function PerformancePage() {
         ref={stageRef}
         className="absolute inset-0 flex items-center justify-center bg-black"
       >
-        {pdfUrl && fitSize && (
+        {pdfUrl && fitSize && PdfView && (
           <div
             className="relative"
             style={{ width: fitSize.width, height: fitSize.height }}
@@ -391,7 +391,7 @@ function PerformancePage() {
                 file={pdfUrl}
                 width={fitSize.width}
                 height={fitSize.height}
-                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
+                onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
               />
             </Suspense>
 
@@ -413,14 +413,14 @@ function PerformancePage() {
         )}
 
         {/* Initial PDF dimension probe (off-screen first-load fallback) */}
-        {pdfUrl && !fitSize && (
+        {pdfUrl && !fitSize && PdfView && (
           <div className="hidden">
             <Suspense fallback={null}>
               <PdfView
                 file={pdfUrl}
                 width={400}
                 height={560}
-                onLoadSuccess={(d) => setPdfDims({ w: d.w, h: d.h })}
+                onLoadSuccess={(d: { w: number; h: number }) => setPdfDims({ w: d.w, h: d.h })}
               />
             </Suspense>
           </div>
