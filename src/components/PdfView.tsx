@@ -42,7 +42,7 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
         if (!canvas) return;
 
         setError(false);
-        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+        const pdfjs = await loadPdfjs();
 
         if (!pdfWorkerSrc) {
           pdfWorkerSrc = new URL(
@@ -52,7 +52,12 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
         }
         pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
-        const pdf = await pdfjs.getDocument(file).promise;
+        let docPromise = docCache.get(file);
+        if (!docPromise) {
+          docPromise = pdfjs.getDocument(file).promise;
+          docCache.set(file, docPromise);
+        }
+        const pdf = await docPromise;
         if (cancelled) return;
 
         const page = await pdf.getPage(1);
