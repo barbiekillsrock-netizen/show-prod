@@ -39,7 +39,7 @@ function PerformancePage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
 
-  const [tool, setTool] = useState<"pen" | "eraser">("pen");
+  const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
   const [color, setColor] = useState<string>("#00E5FF");
   const [drawings, setDrawings] = useState<DrawingMap>({});
 
