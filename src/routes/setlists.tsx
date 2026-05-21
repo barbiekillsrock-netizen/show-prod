@@ -175,12 +175,11 @@ function SetlistDropArea({
 
 /* ---------- Page ---------- */
 function SetlistsPage() {
+  const allSongs = useSongs();
   const [query, setQuery] = useState("");
-  const [setlist, setSetlist] = useState<Song[]>([
-    allSongs[0],
-    allSongs[3],
-    allSongs[6],
-  ]);
+  const [setlist, setSetlist] = useState<Song[]>(() =>
+    [allSongs[0], allSongs[3], allSongs[6]].filter(Boolean),
+  );
   const [activeSong, setActiveSong] = useState<Song | null>(null);
   const [activeSource, setActiveSource] = useState<"library" | "setlist" | null>(
     null,
@@ -198,7 +197,7 @@ function SetlistsPage() {
         s.title.toLowerCase().includes(q) ||
         s.artist.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, allSongs]);
 
   const setlistIds = new Set(setlist.map((s) => s.id));
 
