@@ -17,11 +17,13 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
     if (typeof window === "undefined") return;
 
     let cancelled = false;
-    const canvas = canvasRef.current;
-    if (!canvas || width <= 0 || height <= 0) return;
+    if (!canvasRef.current || width <= 0 || height <= 0) return;
 
     async function renderPdf() {
       try {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
         setError(false);
         const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
@@ -55,7 +57,7 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, viewport.width, viewport.height);
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
       } catch (err) {
         console.error(err);
         if (!cancelled) setError(true);
