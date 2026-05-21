@@ -1,10 +1,30 @@
-import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, Suspense, type ComponentType } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 
-const PdfView = lazy(() => import("@/components/PdfView"));
+type PdfViewProps = {
+  file: string;
+  width: number;
+  height: number;
+  onLoadSuccess: (dims: { w: number; h: number }) => void;
+};
+let PdfViewCache: ComponentType<PdfViewProps> | null = null;
+function usePdfView() {
+  const [Comp, setComp] = useState<ComponentType<PdfViewProps> | null>(PdfViewCache);
+  useEffect(() => {
+    if (Comp) return;
+    // Opaque dynamic path to avoid static bundler analysis pulling pdfjs into SSR.
+    const path = "@/components/PdfView";
+    import(/* @vite-ignore */ path).then((m) => {
+      PdfViewCache = m.default;
+      setComp(() => m.default);
+    });
+  }, [Comp]);
+  return Comp;
+}
+
 
 
 type Point = { x: number; y: number };
