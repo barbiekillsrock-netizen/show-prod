@@ -1,15 +1,18 @@
 import { useSyncExternalStore } from "react";
+import { savePdf, deletePdf } from "@/lib/pdf-storage";
 
 export type Song = {
   id: string;
   title: string;
   artist: string;
   key: string;
-  pdfUrl?: string;
+  hasPdf?: boolean;
   pdfName?: string;
 };
 
-const initialSongs: Song[] = [
+const STORAGE_KEY = "songs:v1";
+
+const defaultSongs: Song[] = [
   { id: "1", title: "Wish You Were Here", artist: "Pink Floyd", key: "G" },
   { id: "2", title: "Tempo Perdido", artist: "Legião Urbana", key: "D" },
   { id: "3", title: "Garota de Ipanema", artist: "Tom Jobim", key: "F" },
@@ -24,26 +27,90 @@ const initialSongs: Song[] = [
   { id: "12", title: "Sunday Bloody Sunday", artist: "U2", key: "D" },
 ];
 
-let state: Song[] = initialSongs;
+function load(): Song[] {
+  if (typeof window === "undefined") return defaultSongs;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultSongs;
+    const parsed = JSON.parse(raw) as Song[];
+    if (!Array.isArray(parsed)) return defaultSongs;
+    return parsed;
+  } catch {
+    return defaultSongs;
+  }
+}
+
+function persist(songs: Song[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+  } catch {
+    // ignore quota
+  }
+}
+
+let state: Song[] = defaultSongs;
+let hydrated = false;
 const listeners = new Set<() => void>();
 
 function emit() {
   for (const l of listeners) l();
 }
 
+function ensureHydrated() {
+  if (hydrated || typeof window === "undefined") return;
+  state = load();
+  hydrated = true;
+}
+
+function makeId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 export const songsStore = {
   get: () => state,
   subscribe(l: () => void) {
+    ensureHydrated();
+    if (hydrated) l(); // sync hydrated state to subscriber
     listeners.add(l);
     return () => listeners.delete(l);
   },
-  add(song: Omit<Song, "id">) {
-    const id =
-      (typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : Math.random().toString(36).slice(2)) + "";
-    state = [{ id, ...song }, ...state];
+  async add(
+    song: Omit<Song, "id" | "hasPdf">,
+    pdfFile?: File | null,
+  ): Promise<Song> {
+    ensureHydrated();
+    const id = makeId();
+    const entry: Song = {
+      id,
+      title: song.title,
+      artist: song.artist,
+      key: song.key,
+      pdfName: pdfFile?.name,
+      hasPdf: false,
+    };
+    if (pdfFile) {
+      try {
+        await savePdf(id, pdfFile);
+        entry.hasPdf = true;
+      } catch {
+        entry.hasPdf = false;
+      }
+    }
+    state = [entry, ...state];
+    persist(state);
     emit();
+    return entry;
+  },
+  async remove(id: string) {
+    ensureHydrated();
+    state = state.filter((s) => s.id !== id);
+    persist(state);
+    emit();
+    await deletePdf(id).catch(() => {});
   },
 };
 
@@ -51,9 +118,8 @@ export function useSongs(): Song[] {
   return useSyncExternalStore(
     songsStore.subscribe,
     songsStore.get,
-    songsStore.get,
+    () => defaultSongs,
   );
 }
 
-// Back-compat export (kept so older imports keep working).
-export const songs = initialSongs;
+export const songs = defaultSongs;
