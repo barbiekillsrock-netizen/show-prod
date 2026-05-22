@@ -58,10 +58,11 @@ function PerformancePage() {
   const drawingRef = useRef(false);
   const currentStrokeRef = useRef<Stroke | null>(null);
 
-  // Redirect home if no setlist
+  // Redirect to setlists only when the URL has no ids at all (don't bounce
+  // while the songs store hydrates from localStorage).
   useEffect(() => {
-    if (setlist.length === 0) navigate({ to: "/setlists" });
-  }, [setlist.length, navigate]);
+    if (!ids) navigate({ to: "/setlists" });
+  }, [ids, navigate]);
 
   // Stage size
   useEffect(() => {
@@ -74,10 +75,21 @@ function PerformancePage() {
     return () => ro.disconnect();
   }, []);
 
-  const pdfUrl = useMemo(
-    () => (mounted && activeSong ? getSongPdfUrl(activeSong) : null),
-    [mounted, activeSong],
-  );
+  // Resolve PDF URL (async — backed by IndexedDB or generated demo)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!mounted || !activeSong) {
+      setPdfUrl(null);
+      return;
+    }
+    let cancelled = false;
+    getSongPdfUrl(activeSong).then((url) => {
+      if (!cancelled) setPdfUrl(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted, activeSong]);
 
   // Compute PDF render size (object-contain)
   const fitSize = useMemo(() => {

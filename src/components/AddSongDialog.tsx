@@ -34,17 +34,18 @@ export function AddSongDialog({
     setPdfFile(file);
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!title.trim() || !artist.trim() || !songKey.trim()) return;
-    const pdfUrl = pdfFile ? URL.createObjectURL(pdfFile) : undefined;
-    songsStore.add({
-      title: title.trim(),
-      artist: artist.trim(),
-      key: songKey.trim(),
-      pdfUrl,
-      pdfName: pdfFile?.name,
-    });
+    await songsStore.add(
+      {
+        title: title.trim(),
+        artist: artist.trim(),
+        key: songKey.trim(),
+        pdfName: pdfFile?.name,
+      },
+      pdfFile,
+    );
     reset();
     onClose();
   }
