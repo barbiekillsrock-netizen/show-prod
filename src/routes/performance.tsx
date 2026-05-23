@@ -36,7 +36,12 @@ function PerformancePage() {
   }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const t = setTimeout(() => setShowHint(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
