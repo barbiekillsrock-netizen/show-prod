@@ -490,6 +490,13 @@ function PerformancePage() {
         <ChevronRight className="h-7 w-7" />
       </button>
 
+      {/* Usage hint (auto-hides) */}
+      {showHint && setlist.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 text-xs text-muted-foreground bg-card/80 backdrop-blur px-3 py-1.5 rounded-md border border-border">
+          Use as setas ← → do teclado, os botões laterais ou deslize para trocar de cifra
+        </div>
+      )}
+
       {/* End-of-show hint when on last */}
       {activeIdx === setlist.length - 1 && (
         <div className="absolute bottom-4 right-4 z-30 text-xs text-muted-foreground bg-card/70 backdrop-blur px-3 py-1.5 rounded-md border border-border flex items-center gap-2">
