@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 import PdfView from "@/components/PdfView";
@@ -36,7 +36,12 @@ function PerformancePage() {
   }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const t = setTimeout(() => setShowHint(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
@@ -307,6 +312,24 @@ function PerformancePage() {
           <p className="text-xs text-muted-foreground mt-0.5">
             {activeIdx + 1} / {setlist.length}
           </p>
+          {setlist.length > 1 && (
+            <div className="mt-2 flex items-center justify-center gap-1.5">
+              {setlist.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveIdx(i)}
+                  aria-label={`Ir para música ${i + 1}: ${s.title}`}
+                  title={`${i + 1}. ${s.title}`}
+                  className={`h-2 rounded-full transition-all ${
+                    i === activeIdx
+                      ? "w-6 bg-primary"
+                      : "w-2 bg-muted hover:bg-muted-foreground/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
@@ -433,31 +456,46 @@ function PerformancePage() {
 
       </div>
 
-      {/* Invisible side tap/swipe zones */}
+      {/* Side swipe zones (keep gesture support, invisible) */}
+      <div
+        aria-hidden
+        onTouchStart={onSwipeStart}
+        onTouchEnd={(e) => onSwipeEnd(e, () => {})}
+        className="absolute top-0 bottom-0 left-0 w-[50px] z-10"
+      />
+      <div
+        aria-hidden
+        onTouchStart={onSwipeStart}
+        onTouchEnd={(e) => onSwipeEnd(e, () => {})}
+        className="absolute top-0 bottom-0 right-0 w-[50px] z-10"
+      />
+
+      {/* Visible navigation buttons */}
       <button
         type="button"
         aria-label="Música anterior"
         onClick={goPrev}
-        onTouchStart={onSwipeStart}
-        onTouchEnd={(e) => onSwipeEnd(e, goPrev)}
-        className="absolute top-0 bottom-0 left-0 w-[50px] z-20 bg-transparent group"
+        disabled={activeIdx === 0}
+        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
-        <span className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 transition-opacity">
-          <ChevronLeft className="h-8 w-8 text-primary" />
-        </span>
+        <ChevronLeft className="h-7 w-7" />
       </button>
       <button
         type="button"
         aria-label="Próxima música"
         onClick={goNext}
-        onTouchStart={onSwipeStart}
-        onTouchEnd={(e) => onSwipeEnd(e, goNext)}
-        className="absolute top-0 bottom-0 right-0 w-[50px] z-20 bg-transparent group"
+        disabled={activeIdx >= setlist.length - 1}
+        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 transition-opacity rotate-180">
-          <ChevronLeft className="h-8 w-8 text-primary" />
-        </span>
+        <ChevronRight className="h-7 w-7" />
       </button>
+
+      {/* Usage hint (auto-hides) */}
+      {showHint && setlist.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 text-xs text-muted-foreground bg-card/80 backdrop-blur px-3 py-1.5 rounded-md border border-border">
+          Use as setas ← → do teclado, os botões laterais ou deslize para trocar de cifra
+        </div>
+      )}
 
       {/* End-of-show hint when on last */}
       {activeIdx === setlist.length - 1 && (
