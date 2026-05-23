@@ -77,7 +77,7 @@ function SetlistsIndex() {
     if (s.songIds.length === 0) return;
     navigate({
       to: "/performance",
-      search: { ids: s.songIds.join(","), name: s.name },
+      search: { ids: s.songIds.join(","), name: s.name, from: "setlists" },
     });
   }
 
@@ -402,7 +402,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
     if (setlist.length === 0) return;
     navigate({
       to: "/performance",
-      search: { ids: setlist.map((s) => s.id).join(","), name: meta.name },
+      search: { ids: setlist.map((s) => s.id).join(","), name: meta.name, from: "setlists" },
     });
   }
 

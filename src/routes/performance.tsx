@@ -17,12 +17,14 @@ export const Route = createFileRoute("/performance")({
   validateSearch: (search: Record<string, unknown>) => ({
     ids: typeof search.ids === "string" ? search.ids : "",
     name: typeof search.name === "string" ? search.name : "Show",
+    from: typeof search.from === "string" ? search.from : "",
   }),
   component: PerformancePage,
 });
 
 function PerformancePage() {
-  const { ids, name } = useSearch({ from: "/performance" });
+  const { ids, name, from } = useSearch({ from: "/performance" });
+  const exitTo = from === "songs" ? "/" : "/setlists";
   const navigate = useNavigate();
 
   const allSongs = useSongs();
@@ -61,7 +63,7 @@ function PerformancePage() {
   // Redirect to setlists only when the URL has no ids at all (don't bounce
   // while the songs store hydrates from localStorage).
   useEffect(() => {
-    if (!ids) navigate({ to: "/setlists" });
+    if (!ids) navigate({ to: exitTo });
   }, [ids, navigate]);
 
   // Stage size
@@ -146,11 +148,11 @@ function PerformancePage() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "Escape") navigate({ to: "/setlists" });
+      if (e.key === "Escape") navigate({ to: exitTo });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goNext, goPrev, navigate]);
+  }, [goNext, goPrev, navigate, exitTo]);
 
   // ---------- Drawing handlers ----------
   function getCanvasPoint(e: React.PointerEvent<HTMLCanvasElement>): Point | null {
@@ -286,7 +288,7 @@ function PerformancePage() {
       <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 pointer-events-none">
         <button
           type="button"
-          onClick={() => navigate({ to: "/setlists" })}
+          onClick={() => navigate({ to: exitTo })}
           className="pointer-events-auto inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card"
         >
           <ChevronLeft className="h-5 w-5" />
