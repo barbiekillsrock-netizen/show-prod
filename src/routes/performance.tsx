@@ -17,6 +17,7 @@ export const Route = createFileRoute("/performance")({
   validateSearch: (search: Record<string, unknown>) => ({
     ids: typeof search.ids === "string" ? search.ids : "",
     name: typeof search.name === "string" ? search.name : "Show",
+    from: typeof search.from === "string" ? search.from : "",
   }),
   component: PerformancePage,
 });
