@@ -402,7 +402,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
     if (setlist.length === 0) return;
     navigate({
       to: "/performance",
-      search: { ids: setlist.map((s) => s.id).join(","), name: meta.name },
+      search: { ids: setlist.map((s) => s.id).join(","), name: meta.name, from: "setlists" },
     });
   }
 
