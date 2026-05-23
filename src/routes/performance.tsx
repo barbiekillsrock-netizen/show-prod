@@ -23,7 +23,8 @@ export const Route = createFileRoute("/performance")({
 });
 
 function PerformancePage() {
-  const { ids, name } = useSearch({ from: "/performance" });
+  const { ids, name, from } = useSearch({ from: "/performance" });
+  const exitTo = from === "songs" ? "/" : "/setlists";
   const navigate = useNavigate();
 
   const allSongs = useSongs();
