@@ -152,7 +152,7 @@ function PerformancePage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goNext, goPrev, navigate]);
+  }, [goNext, goPrev, navigate, exitTo]);
 
   // ---------- Drawing handlers ----------
   function getCanvasPoint(e: React.PointerEvent<HTMLCanvasElement>): Point | null {
