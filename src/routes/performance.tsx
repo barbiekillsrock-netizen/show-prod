@@ -307,6 +307,24 @@ function PerformancePage() {
           <p className="text-xs text-muted-foreground mt-0.5">
             {activeIdx + 1} / {setlist.length}
           </p>
+          {setlist.length > 1 && (
+            <div className="mt-2 flex items-center justify-center gap-1.5">
+              {setlist.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveIdx(i)}
+                  aria-label={`Ir para música ${i + 1}: ${s.title}`}
+                  title={`${i + 1}. ${s.title}`}
+                  className={`h-2 rounded-full transition-all ${
+                    i === activeIdx
+                      ? "w-6 bg-primary"
+                      : "w-2 bg-muted hover:bg-muted-foreground/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
