@@ -49,18 +49,23 @@ function persist(songs: Song[]) {
   }
 }
 
-let state: Song[] = defaultSongs;
 let hydrated = false;
-const listeners = new Set<() => void>();
-
-function emit() {
-  for (const l of listeners) l();
-}
-
 function ensureHydrated() {
   if (hydrated || typeof window === "undefined") return;
   state = load();
   hydrated = true;
+}
+
+// Hydrate eagerly on the client so the first render already has persisted songs.
+let state: Song[] = defaultSongs;
+if (typeof window !== "undefined") {
+  state = load();
+  hydrated = true;
+}
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const l of listeners) l();
 }
 
 function makeId(): string {
