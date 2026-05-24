@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import "@/lib/pdf-preload";
 import { AppSidebar } from "@/components/AppSidebar";
 
 function NotFoundComponent() {
