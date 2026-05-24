@@ -86,10 +86,20 @@ function buildDemoPdfUrl(song: Song): string {
   return url;
 }
 
+export class MissingUploadedPdfError extends Error {
+  constructor(public songId: string) {
+    super(`PDF não encontrado no armazenamento local (song ${songId})`);
+    this.name = "MissingUploadedPdfError";
+  }
+}
+
 export async function getSongPdfUrl(song: Song): Promise<string> {
   if (song.hasPdf) {
     const url = await getPdfObjectUrl(song.id);
     if (url) return url;
+    // Não mascarar com a cifra demo: o usuário fez upload e espera ver o
+    // arquivo dele. Sinalizar erro explicitamente.
+    throw new MissingUploadedPdfError(song.id);
   }
   return buildDemoPdfUrl(song);
 }
