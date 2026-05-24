@@ -82,16 +82,25 @@ function PerformancePage() {
     return () => ro.disconnect();
   }, []);
 
-  // Resolve PDF URL (async — backed by IndexedDB or generated demo)
+  // Resolve PDF URL (async — backed by IndexedDB or generated demo).
   // Keep previous URL while loading the next one to avoid a black flash.
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfMissing, setPdfMissing] = useState(false);
   const activeSongId = activeSong?.id;
   useEffect(() => {
     if (!mounted || !activeSong) return;
     let cancelled = false;
-    getSongPdfUrl(activeSong).then((url) => {
-      if (!cancelled) setPdfUrl(url);
-    });
+    setPdfMissing(false);
+    getSongPdfUrl(activeSong)
+      .then((url) => {
+        if (!cancelled) setPdfUrl(url);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("[performance] PDF load error", err);
+        setPdfUrl(null);
+        setPdfMissing(true);
+      });
     return () => {
       cancelled = true;
     };
