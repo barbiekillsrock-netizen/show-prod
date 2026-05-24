@@ -83,12 +83,11 @@ function PerformancePage() {
   }, []);
 
   // Resolve PDF URL (async — backed by IndexedDB or generated demo)
+  // Keep previous URL while loading the next one to avoid a black flash.
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const activeSongId = activeSong?.id;
   useEffect(() => {
-    if (!mounted || !activeSong) {
-      setPdfUrl(null);
-      return;
-    }
+    if (!mounted || !activeSong) return;
     let cancelled = false;
     getSongPdfUrl(activeSong).then((url) => {
       if (!cancelled) setPdfUrl(url);
@@ -96,7 +95,7 @@ function PerformancePage() {
     return () => {
       cancelled = true;
     };
-  }, [mounted, activeSong]);
+  }, [mounted, activeSongId]);
 
   // Compute PDF render size (object-contain)
   const fitSize = useMemo(() => {
