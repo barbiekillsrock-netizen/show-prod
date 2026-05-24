@@ -1,18 +1,39 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Plus } from "lucide-react";
 import { useSongs } from "@/data/songs";
 import { SongCard } from "@/components/SongCard";
 import { AddSongDialog } from "@/components/AddSongDialog";
+import { getSongPdfUrl } from "@/lib/song-pdf";
 
 export const Route = createFileRoute("/")({
   component: SongsPage,
 });
 
 function SongsPage() {
+  const router = useRouter();
   const songs = useSongs();
   const [query, setQuery] = useState("");
   const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const warmUp = () => {
+      void import("@/components/PdfView");
+      void router.preloadRoute({
+        to: "/performance",
+        search: { ids: songs[0]?.id ?? "", name: songs[0]?.title ?? "Show", from: "songs" },
+      }).catch(() => {});
+      songs
+        .filter((song) => song.hasPdf)
+        .slice(0, 12)
+        .forEach((song) => void getSongPdfUrl(song).catch(() => {}));
+    };
+    const requestIdle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 250));
+    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
+    const id = requestIdle(warmUp);
+    return () => cancelIdle(id);
+  }, [router, songs]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
