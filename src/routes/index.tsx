@@ -29,8 +29,11 @@ function SongsPage() {
         .slice(0, 12)
         .forEach((song) => void getSongPdfUrl(song).catch(() => {}));
     };
-    const requestIdle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 250));
-    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
+    const requestIdle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(() => cb({
+      didTimeout: false,
+      timeRemaining: () => 0,
+    }), 250));
+    const cancelIdle = window.cancelIdleCallback ?? ((id: number) => window.clearTimeout(id));
     const id = requestIdle(warmUp);
     return () => cancelIdle(id);
   }, [router, songs]);
