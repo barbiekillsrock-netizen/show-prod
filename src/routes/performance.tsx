@@ -11,6 +11,7 @@ import PdfView from "@/components/PdfView";
 type Point = { x: number; y: number };
 type Stroke = { tool: "pen"; color: string; width: number; points: Point[] };
 type DrawingMap = Record<string, Stroke[]>;
+const DEFAULT_PDF_DIMS = { w: 595.28, h: 841.89 };
 
 export const Route = createFileRoute("/performance")({
   ssr: false,
@@ -54,10 +55,14 @@ function PerformancePage() {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
-  const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(null);
+  const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(DEFAULT_PDF_DIMS);
 
   const handlePdfLoadSuccess = useCallback((d: { w: number; h: number }) => {
-    setPdfDims((prev) => (prev && prev.w === d.w && prev.h === d.h ? prev : d));
+    setPdfDims((prev) => (
+      prev && Math.abs(prev.w - d.w) < 0.5 && Math.abs(prev.h - d.h) < 0.5
+        ? prev
+        : d
+    ));
   }, []);
 
   // Touch swipe state
