@@ -461,6 +461,19 @@ function PerformancePage() {
           </div>
         )}
 
+        {pdfMissing && (
+          <div className="max-w-md mx-6 text-center bg-card/90 border border-destructive/50 text-foreground rounded-lg p-6">
+            <p className="text-lg font-semibold text-destructive mb-2">
+              Arquivo PDF não encontrado
+            </p>
+            <p className="text-sm text-muted-foreground">
+              O upload desta cifra não está mais disponível no armazenamento
+              do navegador. Isso pode acontecer se os dados do site forem
+              limpos. Reenvie o PDF em "Músicas" para restaurá-lo.
+            </p>
+          </div>
+        )}
+
 
       </div>
 
