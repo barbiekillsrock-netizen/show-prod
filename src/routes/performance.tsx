@@ -421,15 +421,12 @@ function PerformancePage() {
       {/* Stage */}
       <div
         ref={stageRef}
-        className="absolute inset-0 flex items-center justify-center bg-black"
+        className="absolute inset-0 overflow-y-auto bg-black flex justify-center"
       >
         {pdfUrl && stageSize.width > 0 && stageSize.height > 0 && (
           <div
-            className="relative"
-            style={{
-              width: fitSize?.width ?? stageSize.width,
-              height: fitSize?.height ?? stageSize.height,
-            }}
+            className="relative my-auto"
+            style={{ width: fitSize?.width ?? stageSize.width }}
           >
             <PdfView
               file={pdfUrl}
@@ -438,11 +435,11 @@ function PerformancePage() {
               onLoadSuccess={handlePdfLoadSuccess}
             />
 
-            {/* Canvas overlay - only active when a tool is selected */}
+            {/* Canvas overlay (first page only) - active when a tool is selected */}
             {fitSize && tool !== null && (
               <canvas
                 ref={canvasRef}
-                className="absolute inset-0 touch-none"
+                className="absolute top-0 left-0 touch-none"
                 style={{
                   width: fitSize.width,
                   height: fitSize.height,
@@ -459,7 +456,7 @@ function PerformancePage() {
             {fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && (
               <canvas
                 ref={canvasRef}
-                className="absolute inset-0 pointer-events-none"
+                className="absolute top-0 left-0 pointer-events-none"
                 style={{ width: fitSize.width, height: fitSize.height }}
               />
             )}

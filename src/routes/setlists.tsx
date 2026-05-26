@@ -4,6 +4,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   useDraggable,
@@ -192,7 +193,7 @@ function RepertoireItem({ song, inSetlist }: { song: Song; inSetlist: boolean })
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-lg border transition-all select-none ${
+      className={`flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-lg border transition-all select-none touch-none ${
         inSetlist
           ? "bg-card/40 border-border opacity-40 cursor-not-allowed"
           : "bg-card border-border cursor-grab active:cursor-grabbing hover:border-primary/60"
@@ -327,6 +328,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
   );
 
   const filtered = useMemo(() => {
