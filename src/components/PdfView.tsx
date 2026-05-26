@@ -12,11 +12,9 @@ function loadPdfjs() {
   return pdfjsPromise;
 }
 if (typeof window !== "undefined") {
-  // kick off the import early
   loadPdfjs().catch(() => {});
 }
 
-// Cache loaded PDF documents by file URL to avoid reloading on resize
 const docCache = new Map<string, Promise<import("pdfjs-dist/legacy/build/pdf.mjs").PDFDocumentProxy>>();
 
 type Props = {
@@ -26,38 +24,25 @@ type Props = {
   onLoadSuccess: (dims: { w: number; h: number }) => void;
 };
 
-type PdfRenderTask = {
-  cancel: () => void;
-  promise: Promise<unknown>;
-};
-
 export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const renderTaskRef = useRef<PdfRenderTask | null>(null);
-  const renderRunRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const runRef = useRef(0);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (!containerRef.current || width <= 0 || height <= 0) return;
 
     let cancelled = false;
-    const runId = ++renderRunRef.current;
-    if (!canvasRef.current || width <= 0 || height <= 0) return;
+    const runId = ++runRef.current;
+    const container = containerRef.current;
+    const activeTasks: Array<{ cancel: () => void }> = [];
 
     async function renderPdf() {
       try {
-        const previousTask = renderTaskRef.current;
-        if (previousTask) {
-          previousTask.cancel();
-          await previousTask.promise.catch(() => undefined);
-        }
-        if (cancelled || runId !== renderRunRef.current) return;
-
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
         setError(false);
         const pdfjs = await loadPdfjs();
+        if (cancelled || runId !== runRef.current) return;
 
         if (!pdfWorkerSrc) {
           pdfWorkerSrc = new URL(
@@ -73,31 +58,51 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
           docCache.set(file, docPromise);
         }
         const pdf = await docPromise;
-        if (cancelled) return;
+        if (cancelled || runId !== runRef.current) return;
 
-        const page = await pdf.getPage(1);
-        if (cancelled) return;
-
-        const baseViewport = page.getViewport({ scale: 1 });
+        const firstPage = await pdf.getPage(1);
+        if (cancelled || runId !== runRef.current) return;
+        const baseViewport = firstPage.getViewport({ scale: 1 });
         onLoadSuccess({ w: baseViewport.width, h: baseViewport.height });
 
-        const scale = Math.min(width / baseViewport.width, height / baseViewport.height);
-        const viewport = page.getViewport({ scale });
+        // Fit first page using width AND height (object-contain),
+        // remaining pages reuse the same scale so the layout is consistent.
+        const fitScale = Math.min(
+          width / baseViewport.width,
+          height / baseViewport.height,
+        );
         const dpr = window.devicePixelRatio || 1;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
 
-        canvas.width = Math.floor(viewport.width * dpr);
-        canvas.height = Math.floor(viewport.height * dpr);
-        canvas.style.width = `${viewport.width}px`;
-        canvas.style.height = `${viewport.height}px`;
+        // Clear container
+        container.innerHTML = "";
 
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, viewport.width, viewport.height);
-        const renderTask = page.render({ canvas, canvasContext: ctx, viewport });
-        renderTaskRef.current = renderTask;
-        await renderTask.promise;
-        if (renderTaskRef.current === renderTask) renderTaskRef.current = null;
+        for (let p = 1; p <= pdf.numPages; p++) {
+          if (cancelled || runId !== runRef.current) return;
+          const page = p === 1 ? firstPage : await pdf.getPage(p);
+          if (cancelled || runId !== runRef.current) return;
+          const viewport = page.getViewport({ scale: fitScale });
+
+          const canvas = document.createElement("canvas");
+          canvas.className = "block bg-white mx-auto";
+          if (p > 1) canvas.style.marginTop = "12px";
+          canvas.width = Math.floor(viewport.width * dpr);
+          canvas.height = Math.floor(viewport.height * dpr);
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
+          container.appendChild(canvas);
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) continue;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const task = page.render({ canvas, canvasContext: ctx, viewport });
+          activeTasks.push(task);
+          try {
+            await task.promise;
+          } catch (err) {
+            if (err instanceof Error && err.name === "RenderingCancelledException") return;
+            throw err;
+          }
+        }
       } catch (err) {
         if (err instanceof Error && err.name === "RenderingCancelledException") return;
         console.error(err);
@@ -109,7 +114,13 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
 
     return () => {
       cancelled = true;
-      renderTaskRef.current?.cancel();
+      for (const t of activeTasks) {
+        try {
+          t.cancel();
+        } catch {
+          // ignore
+        }
+      }
     };
   }, [file, height, onLoadSuccess, width]);
 
@@ -121,12 +132,5 @@ export default function PdfView({ file, width, height, onLoadSuccess }: Props) {
     );
   }
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="block bg-white"
-      style={{ width, height }}
-      aria-label="PDF da cifra"
-    />
-  );
+  return <div ref={containerRef} aria-label="PDF da cifra" />;
 }
