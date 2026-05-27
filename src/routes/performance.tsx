@@ -159,13 +159,29 @@ function PerformancePage() {
     redraw();
   }, [redraw]);
 
-  // Navigation
+  // Navigation: prev/next moves through pages first, then between songs.
   const goPrev = useCallback(() => {
+    const info = pdfRef.current?.getPageInfo();
+    if (info && info.current > 0) {
+      pdfRef.current?.scrollByPages(-1);
+      return;
+    }
     setActiveIdx((i) => (i > 0 ? i - 1 : i));
   }, []);
   const goNext = useCallback(() => {
+    const info = pdfRef.current?.getPageInfo();
+    if (info && info.current < info.total - 1) {
+      pdfRef.current?.scrollByPages(1);
+      return;
+    }
     setActiveIdx((i) => (i < setlist.length - 1 ? i + 1 : i));
-  }, []);
+  }, [setlist.length]);
+
+  // Reset scroll to first page whenever the active song changes
+  useEffect(() => {
+    pdfRef.current?.scrollToStart();
+    setPageInfo({ current: 0, total: 1 });
+  }, [activeIdx]);
 
   // Keyboard nav
   useEffect(() => {
