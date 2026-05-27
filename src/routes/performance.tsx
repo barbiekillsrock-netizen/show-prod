@@ -54,8 +54,10 @@ function PerformancePage() {
   // Container for PDF + canvas overlay
   const stageRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pdfRef = useRef<PdfViewHandle | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(DEFAULT_PDF_DIMS);
+  const [pageInfo, setPageInfo] = useState<{ current: number; total: number }>({ current: 0, total: 1 });
 
   const handlePdfLoadSuccess = useCallback((d: { w: number; h: number }) => {
     setPdfDims((prev) => (
@@ -63,6 +65,10 @@ function PerformancePage() {
         ? prev
         : d
     ));
+  }, []);
+
+  const handlePagesChange = useCallback((info: { current: number; total: number }) => {
+    setPageInfo(info);
   }, []);
 
   // Touch swipe state
