@@ -38,7 +38,8 @@ import {
 import { useSongs, type Song } from "@/data/songs";
 import { jsPDF } from "jspdf";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { getSongPdfUrl } from "@/lib/song-pdf";
+import { getPdfBlob } from "@/lib/pdf-storage";
+import { buildDemoPdfBytes } from "@/lib/demo-pdf";
 import { useSetlists, setlistsStore, type Setlist } from "@/data/setlists";
 
 export const Route = createFileRoute("/setlists")({
@@ -171,9 +172,14 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   // Para cada música do setlist, concatena o PDF (real ou demo)
   for (const song of validSongs) {
     try {
-      const url = await getSongPdfUrl(song);
-      const resp = await fetch(url);
-      const arrayBuf = await resp.arrayBuffer();
+      let arrayBuf: ArrayBuffer;
+      if (song.hasPdf) {
+        const blob = await getPdfBlob(song.id);
+        if (!blob) continue;
+        arrayBuf = await blob.arrayBuffer();
+      } else {
+        arrayBuf = buildDemoPdfBytes(song);
+      }
       const songDoc = await PDFDocument.load(arrayBuf);
       const pages = await merged.copyPages(songDoc, songDoc.getPageIndices());
       // Adiciona separador de música (cabeçalho discreto na primeira página)
