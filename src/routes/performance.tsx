@@ -71,8 +71,6 @@ function PerformancePage() {
     setPageInfo(info);
   }, []);
 
-  // Touch swipe state
-  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const drawingRef = useRef(false);
   const currentStrokeRef = useRef<Stroke | null>(null);
 
