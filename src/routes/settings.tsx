@@ -18,7 +18,6 @@ function SettingsPage() {
         {[
           { label: "Rolagem automática", value: "Em breve" },
           { label: "Manter tela ligada", value: "Em breve" },
-          { label: "Tema", value: "Cockpit Dark" },
         ].map((item) => (
           <div
             key={item.label}
