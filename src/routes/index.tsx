@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Plus } from "lucide-react";
-import { useSongs } from "@/data/songs";
+import { useSongs, GENRES } from "@/data/songs";
 import { SongCard } from "@/components/SongCard";
 import { AddSongDialog } from "@/components/AddSongDialog";
 import { getSongPdfUrl } from "@/lib/song-pdf";
@@ -14,6 +14,7 @@ function SongsPage() {
   const router = useRouter();
   const songs = useSongs();
   const [query, setQuery] = useState("");
+  const [genreFilter, setGenreFilter] = useState("");
   const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
@@ -40,14 +41,21 @@ function SongsPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return songs;
-    return songs.filter(
-      (s) =>
+    return songs.filter((s) => {
+      const matchesQuery = !q ||
         s.title.toLowerCase().includes(q) ||
         s.artist.toLowerCase().includes(q) ||
-        s.key.toLowerCase().includes(q),
-    );
-  }, [query, songs]);
+        s.key.toLowerCase().includes(q);
+      const matchesGenre = !genreFilter || s.genre === genreFilter;
+      return matchesQuery && matchesGenre;
+    });
+  }, [query, genreFilter, songs]);
+
+  // Gêneros que existem no repertório atual
+  const activeGenres = useMemo(() => {
+    const set = new Set(songs.map((s) => s.genre).filter(Boolean) as string[]);
+    return GENRES.filter((g) => set.has(g));
+  }, [songs]);
 
   return (
     <div className="p-8 lg:p-10">
@@ -79,6 +87,35 @@ function SongsPage() {
           Adicionar Nova Cifra
         </button>
       </div>
+
+      {/* Filtro por estilo */}
+      {activeGenres.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-6 -mt-2">
+          {activeGenres.map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setGenreFilter(genreFilter === g ? "" : g)}
+              className={`h-8 px-3 rounded-full text-sm font-medium transition-colors ${
+                genreFilter === g
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card border border-border text-muted-foreground hover:border-primary/60 hover:text-foreground"
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+          {genreFilter && (
+            <button
+              type="button"
+              onClick={() => setGenreFilter("")}
+              className="h-8 px-3 rounded-full text-sm font-medium bg-card border border-border text-muted-foreground hover:text-foreground"
+            >
+              ✕ Limpar
+            </button>
+          )}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground text-base">

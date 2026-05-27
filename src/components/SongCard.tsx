@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import type { Song } from "@/data/songs";
 import { songsStore } from "@/data/songs";
 import { setlistsStore } from "@/data/setlists";
+import { AddSongDialog } from "@/components/AddSongDialog";
 
 export function SongCard({ song }: { song: Song }) {
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
@@ -69,18 +71,31 @@ export function SongCard({ song }: { song: Song }) {
           <p className="mt-2 text-base text-muted-foreground">{song.artist}</p>
         </div>
 
-        {/* Botão deletar — aparece no hover */}
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="absolute bottom-4 right-4 p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all min-h-[36px] min-w-[36px] flex items-center justify-center"
-          aria-label="Excluir música"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        {/* Botões editar e deletar — aparecem no hover */}
+        <div className="absolute bottom-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setEditOpen(true); }}
+            className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 min-h-[36px] min-w-[36px] flex items-center justify-center"
+            aria-label="Editar música"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 min-h-[36px] min-w-[36px] flex items-center justify-center"
+            aria-label="Excluir música"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </button>
 
-      {/* Modal de confirmação de delete */}
+      {/* Dialog de edição */}
+      <AddSongDialog open={editOpen} onClose={() => setEditOpen(false)} song={song} />
+
+      {/* Modal de confirmação de delete */}}
       {confirmDelete && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"

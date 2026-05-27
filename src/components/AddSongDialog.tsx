@@ -1,20 +1,23 @@
 import { useRef, useState, type FormEvent } from "react";
 import { X, FileText, Upload, Trash2, ChevronDown } from "lucide-react";
-import { songsStore, VALID_KEYS, GENRES, normalizeKey, isValidKey } from "@/data/songs";
+import { songsStore, VALID_KEYS, GENRES, normalizeKey, isValidKey, type Song } from "@/data/songs";
 
 export function AddSongDialog({
   open,
   onClose,
+  song,
 }: {
   open: boolean;
   onClose: () => void;
+  song?: Song; // se passado, entra em modo edição
 }) {
-  const [title, setTitle] = useState("");
-  const [artist, setArtist] = useState("");
-  const [songKey, setSongKey] = useState("");
+  const isEditing = Boolean(song);
+  const [title, setTitle] = useState(song?.title ?? "");
+  const [artist, setArtist] = useState(song?.artist ?? "");
+  const [songKey, setSongKey] = useState(song?.key ?? "");
   const [keyTouched, setKeyTouched] = useState(false);
   const [keySuggestions, setKeySuggestions] = useState<string[]>([]);
-  const [genre, setGenre] = useState("");
+  const [genre, setGenre] = useState(song?.genre ?? "");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -26,12 +29,12 @@ export function AddSongDialog({
   const canSubmit = title.trim() && artist.trim() && !keyError;
 
   function reset() {
-    setTitle("");
-    setArtist("");
-    setSongKey("");
+    setTitle(song?.title ?? "");
+    setArtist(song?.artist ?? "");
+    setSongKey(song?.key ?? "");
     setKeyTouched(false);
     setKeySuggestions([]);
-    setGenre("");
+    setGenre(song?.genre ?? "");
     setPdfFile(null);
   }
 
@@ -73,16 +76,29 @@ export function AddSongDialog({
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
-    await songsStore.add(
-      {
-        title: title.trim(),
-        artist: artist.trim(),
-        key: songKey.trim() ? normalizeKey(songKey) : "",
-        genre: genre || undefined,
-        pdfName: pdfFile?.name,
-      },
-      pdfFile,
-    );
+    if (isEditing && song) {
+      await songsStore.update(
+        song.id,
+        {
+          title: title.trim(),
+          artist: artist.trim(),
+          key: songKey.trim() ? normalizeKey(songKey) : "",
+          genre: genre || undefined,
+        },
+        pdfFile,
+      );
+    } else {
+      await songsStore.add(
+        {
+          title: title.trim(),
+          artist: artist.trim(),
+          key: songKey.trim() ? normalizeKey(songKey) : "",
+          genre: genre || undefined,
+          pdfName: pdfFile?.name,
+        },
+        pdfFile,
+      );
+    }
     reset();
     onClose();
   }
@@ -99,10 +115,10 @@ export function AddSongDialog({
         <div className="flex items-start justify-between mb-5">
           <div>
             <h3 className="text-2xl font-bold text-foreground">
-              Adicionar Nova Cifra
+              {isEditing ? "Editar Cifra" : "Adicionar Nova Cifra"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Cadastre uma música no seu repertório.
+              {isEditing ? "Atualize os dados da música." : "Cadastre uma música no seu repertório."}
             </p>
           </div>
           <button
@@ -286,7 +302,7 @@ export function AddSongDialog({
               disabled={!canSubmit}
               className="h-12 px-6 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]"
             >
-              Adicionar
+              {isEditing ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </form>

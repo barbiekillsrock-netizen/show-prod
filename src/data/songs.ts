@@ -145,6 +145,32 @@ export const songsStore = {
     emit();
     await deletePdf(id).catch(() => {});
   },
+  async update(
+    id: string,
+    patch: Partial<Omit<Song, "id" | "hasPdf">>,
+    pdfFile?: File | null,
+  ): Promise<void> {
+    ensureHydrated();
+    const existing = state.find((s) => s.id === id);
+    if (!existing) return;
+    const updated: Song = {
+      ...existing,
+      ...patch,
+      key: patch.key !== undefined ? normalizeKey(patch.key) : existing.key,
+    };
+    if (pdfFile) {
+      try {
+        await savePdf(id, pdfFile);
+        updated.hasPdf = true;
+        updated.pdfName = pdfFile.name;
+      } catch {
+        // keep existing
+      }
+    }
+    state = state.map((s) => (s.id === id ? updated : s));
+    persist(state);
+    emit();
+  },
 };
 
 export function useSongs(): Song[] {
