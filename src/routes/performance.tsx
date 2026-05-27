@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
-import PdfView from "@/components/PdfView";
+import PdfView, { type PdfViewHandle } from "@/components/PdfView";
 
 
 
