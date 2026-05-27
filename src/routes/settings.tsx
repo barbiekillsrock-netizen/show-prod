@@ -16,9 +16,8 @@ function SettingsPage() {
 
       <div className="space-y-4 max-w-2xl">
         {[
-          { label: "Tamanho da fonte da cifra", value: "Médio" },
-          { label: "Rolagem automática", value: "Desativada" },
-          { label: "Manter tela ligada", value: "Ativada" },
+          { label: "Rolagem automática", value: "Em breve" },
+          { label: "Manter tela ligada", value: "Em breve" },
           { label: "Tema", value: "Cockpit Dark" },
         ].map((item) => (
           <div
@@ -26,7 +25,7 @@ function SettingsPage() {
             className="flex items-center justify-between bg-card border border-border rounded-xl p-5 min-h-[64px]"
           >
             <span className="text-base font-medium text-foreground">{item.label}</span>
-            <span className="text-base text-primary font-semibold">{item.value}</span>
+            <span className="text-base text-muted-foreground font-medium">{item.value}</span>
           </div>
         ))}
       </div>
