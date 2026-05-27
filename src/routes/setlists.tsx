@@ -37,7 +37,6 @@ import {
 } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { jsPDF } from "jspdf";
-import { PDFDocument, rgb } from "pdf-lib";
 import { getPdfBlob } from "@/lib/pdf-storage";
 import { buildDemoPdfBytes } from "@/lib/demo-pdf";
 import { useSetlists, setlistsStore, type Setlist } from "@/data/setlists";
@@ -153,6 +152,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   const coverBytes = cover.output("arraybuffer");
 
   // ── 2. Merge nativo com pdf-lib ──────────────────────────────────────────
+  const { PDFDocument, rgb } = await import("pdf-lib");
   const merged = await PDFDocument.create();
 
   // Copia páginas da capa
