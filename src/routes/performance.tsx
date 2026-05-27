@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Clock, Pause, Play } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 import PdfView, { type PdfViewHandle } from "@/components/PdfView";
@@ -49,6 +49,28 @@ function PerformancePage() {
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
   const [darkMode, setDarkMode] = useState(true); // padrão ligado para palco
+
+  // Cronômetro
+  const [elapsed, setElapsed] = useState(0); // segundos
+  const [timerRunning, setTimerRunning] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (timerRunning) {
+      timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [timerRunning]);
+
+  function formatTime(s: number) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  }
   const [color, setColor] = useState<string>("#00E5FF");
   const [drawings, setDrawings] = useState<DrawingMap>({});
 
@@ -302,14 +324,30 @@ function PerformancePage() {
     <div className="fixed inset-0 z-50 bg-black text-white select-none" data-performance>
       {/* Top bar */}
       <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 pointer-events-none">
-        <button
-          type="button"
-          onClick={() => navigate({ to: exitTo })}
-          className="pointer-events-auto inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          <span className="text-sm font-medium">Sair</span>
-        </button>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate({ to: exitTo })}
+            className="inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="text-sm font-medium">Sair</span>
+          </button>
+
+          {/* Cronômetro */}
+          <button
+            type="button"
+            onClick={() => setTimerRunning((r) => !r)}
+            className="inline-flex items-center gap-1.5 h-11 px-3 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors tabular-nums"
+            title={timerRunning ? "Pausar cronômetro" : "Retomar cronômetro"}
+          >
+            {timerRunning
+              ? <Pause className="h-3.5 w-3.5 shrink-0" />
+              : <Play className="h-3.5 w-3.5 shrink-0 text-primary" />
+            }
+            <span className="text-sm font-mono">{formatTime(elapsed)}</span>
+          </button>
+        </div>
 
         <div className="pointer-events-auto px-4 py-2 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-center">
           <p className="text-xs text-white/40 leading-none">{name}</p>
