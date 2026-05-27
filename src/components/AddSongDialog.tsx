@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
-import { X, FileText, Upload, Trash2 } from "lucide-react";
-import { songsStore } from "@/data/songs";
+import { X, FileText, Upload, Trash2, ChevronDown } from "lucide-react";
+import { songsStore, VALID_KEYS, GENRES, normalizeKey, isValidKey } from "@/data/songs";
 
 export function AddSongDialog({
   open,
@@ -12,17 +12,53 @@ export function AddSongDialog({
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [songKey, setSongKey] = useState("");
+  const [keyTouched, setKeyTouched] = useState(false);
+  const [keySuggestions, setKeySuggestions] = useState<string[]>([]);
+  const [genre, setGenre] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
+
+  const keyError = keyTouched && songKey.trim() !== "" && !isValidKey(songKey);
+  const canSubmit = title.trim() && artist.trim() && !keyError;
 
   function reset() {
     setTitle("");
     setArtist("");
     setSongKey("");
+    setKeyTouched(false);
+    setKeySuggestions([]);
+    setGenre("");
     setPdfFile(null);
+  }
+
+  function handleKeyChange(val: string) {
+    setSongKey(val);
+    if (val.trim()) {
+      const q = val.trim().toLowerCase();
+      setKeySuggestions(
+        VALID_KEYS.filter((k) => k.toLowerCase().startsWith(q) && k.toLowerCase() !== q)
+      );
+    } else {
+      setKeySuggestions([]);
+    }
+  }
+
+  function handleKeyBlur() {
+    setKeyTouched(true);
+    setKeySuggestions([]);
+    if (songKey.trim()) {
+      setSongKey(normalizeKey(songKey));
+    }
+  }
+
+  function pickSuggestion(k: string) {
+    setSongKey(k);
+    setKeySuggestions([]);
+    setKeyTouched(false);
   }
 
   function handlePick(file: File | null | undefined) {
@@ -36,12 +72,13 @@ export function AddSongDialog({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !artist.trim() || !songKey.trim()) return;
+    if (!canSubmit) return;
     await songsStore.add(
       {
         title: title.trim(),
         artist: artist.trim(),
-        key: songKey.trim(),
+        key: songKey.trim() ? normalizeKey(songKey) : "",
+        genre: genre || undefined,
         pdfName: pdfFile?.name,
       },
       pdfFile,
@@ -79,6 +116,7 @@ export function AddSongDialog({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Título */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Título
@@ -92,6 +130,7 @@ export function AddSongDialog({
             />
           </div>
 
+          {/* Artista */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Artista
@@ -104,19 +143,72 @@ export function AddSongDialog({
             />
           </div>
 
+          {/* Estilo */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Tom
+              Estilo{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
             </label>
-            <input
-              value={songKey}
-              onChange={(e) => setSongKey(e.target.value)}
-              placeholder="Ex.: G, Am, F#"
-              className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              maxLength={4}
-            />
+            <div className="relative">
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="w-full h-12 pl-4 pr-10 rounded-lg bg-background border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+              >
+                <option value="">Selecione um estilo...</option>
+                {GENRES.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
 
+          {/* Tom */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Tom{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
+            </label>
+            <div className="relative">
+              <input
+                value={songKey}
+                onChange={(e) => handleKeyChange(e.target.value)}
+                onBlur={handleKeyBlur}
+                onFocus={() => setKeyTouched(false)}
+                placeholder="Ex.: G, Am, F#"
+                maxLength={4}
+                className={`w-full h-12 px-4 rounded-lg bg-background border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                  keyError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-border focus:ring-primary"
+                }`}
+              />
+              {/* Autocomplete dropdown */}
+              {keySuggestions.length > 0 && (
+                <ul className="absolute z-10 top-full mt-1 w-full bg-[#1E1E1E] border border-border rounded-lg shadow-xl overflow-hidden">
+                  {keySuggestions.map((k) => (
+                    <li key={k}>
+                      <button
+                        type="button"
+                        onMouseDown={() => pickSuggestion(k)}
+                        className="w-full text-left px-4 py-2.5 text-base text-[#00E5FF] hover:bg-muted transition-colors"
+                      >
+                        {k}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {keyError && (
+              <p className="mt-1.5 text-sm text-red-500">
+                Tom inválido. Ex: Am, C#, Bb
+              </p>
+            )}
+          </div>
+
+          {/* PDF */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Arquivo PDF da cifra{" "}
@@ -157,10 +249,7 @@ export function AddSongDialog({
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -194,7 +283,7 @@ export function AddSongDialog({
             </button>
             <button
               type="submit"
-              disabled={!title.trim() || !artist.trim() || !songKey.trim()}
+              disabled={!canSubmit}
               className="h-12 px-6 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]"
             >
               Adicionar

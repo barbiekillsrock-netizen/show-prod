@@ -1,11 +1,39 @@
 import { useSyncExternalStore } from "react";
 import { savePdf, deletePdf } from "@/lib/pdf-storage";
 
+export const VALID_KEYS = [
+  "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
+  "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm",
+];
+
+export const GENRES = [
+  "Rock", "Pop", "Sertanejo", "Pagode", "Samba", "MPB", "Forró", "Gospel",
+  "Blues", "Jazz", "Soul/Funk", "R&B", "Hip-Hop", "Eletrônico", "Reggae",
+  "Clássico", "Bossa Nova", "Axé", "Funk", "Metal", "Outro",
+];
+
+export function normalizeKey(raw: string): string {
+  const trimmed = raw.trim();
+  // case-insensitive match
+  const found = VALID_KEYS.find(
+    (k) => k.toLowerCase() === trimmed.toLowerCase()
+  );
+  return found ?? trimmed;
+}
+
+export function isValidKey(raw: string): boolean {
+  if (!raw.trim()) return true; // empty = optional, no error
+  return VALID_KEYS.some(
+    (k) => k.toLowerCase() === raw.trim().toLowerCase()
+  );
+}
+
 export type Song = {
   id: string;
   title: string;
   artist: string;
   key: string;
+  genre?: string;
   hasPdf?: boolean;
   pdfName?: string;
 };
@@ -56,7 +84,6 @@ function ensureHydrated() {
   hydrated = true;
 }
 
-// Hydrate eagerly on the client so the first render already has persisted songs.
 let state: Song[] = defaultSongs;
 if (typeof window !== "undefined") {
   state = load();
@@ -79,7 +106,7 @@ export const songsStore = {
   get: () => state,
   subscribe(l: () => void) {
     ensureHydrated();
-    if (hydrated) l(); // sync hydrated state to subscriber
+    if (hydrated) l();
     listeners.add(l);
     return () => listeners.delete(l);
   },
@@ -93,7 +120,8 @@ export const songsStore = {
       id,
       title: song.title,
       artist: song.artist,
-      key: song.key,
+      key: normalizeKey(song.key),
+      genre: song.genre,
       pdfName: pdfFile?.name,
       hasPdf: false,
     };
