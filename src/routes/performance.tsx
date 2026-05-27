@@ -294,29 +294,6 @@ function PerformancePage() {
     setDrawings((prev) => ({ ...prev, [activeSong.id]: [] }));
   }
 
-  // ---------- Touch swipe (on side zones only) ----------
-  function onSwipeStart(e: React.TouchEvent) {
-    const t = e.touches[0];
-    touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
-  }
-  function onSwipeEnd(e: React.TouchEvent, fallback: () => void) {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start) {
-      fallback();
-      return;
-    }
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    const dt = Date.now() - start.t;
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && dt < 600) {
-      if (dx < 0) goNext();
-      else goPrev();
-    } else {
-      fallback();
-    }
-  }
 
   if (!activeSong) return null;
 
