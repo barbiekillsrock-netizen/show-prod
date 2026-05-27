@@ -14,7 +14,7 @@ export function AppSidebar() {
     <aside className="w-64 shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col">
       <div className="px-6 py-8 border-b border-sidebar-border">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Cifra<span className="text-primary">Stage</span>
+          Show<span className="text-primary">Prod</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">Cockpit do palco</p>
       </div>

@@ -1,6 +1,6 @@
 // IndexedDB-backed storage for song PDFs (browser-only).
 
-const DB_NAME = "cifrastage";
+const DB_NAME = "showprod";
 const DB_VERSION = 1;
 const STORE = "pdfs";
 
