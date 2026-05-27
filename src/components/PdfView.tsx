@@ -51,10 +51,15 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
         const el = containerRef.current;
         if (!el) return;
         const cw = el.clientWidth || 1;
-        el.scrollBy({ left: delta * cw, behavior: "smooth" });
+        const total = Math.max(1, Math.round(el.scrollWidth / cw));
+        const current = Math.round(el.scrollLeft / cw);
+        const target = Math.min(total - 1, Math.max(0, current + delta));
+        el.scrollTo({ left: target * cw, behavior: "smooth" });
       },
       scrollToStart() {
-        containerRef.current?.scrollTo({ left: 0, behavior: "auto" });
+        const el = containerRef.current;
+        if (!el) return;
+        el.scrollLeft = 0;
       },
       getPageInfo() {
         const el = containerRef.current;
@@ -201,7 +206,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
       ref={containerRef}
       aria-label="PDF da cifra"
       className="absolute inset-0 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory pdf-scroll-x"
-      style={{ scrollbarWidth: "none" }}
+      style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
     />
   );
 });
