@@ -26,6 +26,7 @@ type Props = {
   file: string;
   width: number;
   height: number;
+  darkMode?: boolean;
   onLoadSuccess: (dims: { w: number; h: number }) => void;
   onPagesChange?: (info: { current: number; total: number }) => void;
 };
@@ -37,7 +38,7 @@ export type PdfViewHandle = {
 };
 
 const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
-  { file, width, height, onLoadSuccess, onPagesChange },
+  { file, width, height, darkMode = false, onLoadSuccess, onPagesChange },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -149,6 +150,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
 
           const canvas = document.createElement("canvas");
           canvas.className = "block bg-white";
+          canvas.style.filter = darkMode ? "invert(1)" : "";
           canvas.width = Math.floor(viewport.width * dpr);
           canvas.height = Math.floor(viewport.height * dpr);
           canvas.style.width = `${viewport.width}px`;
@@ -191,7 +193,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
         }
       }
     };
-  }, [file, height, onLoadSuccess, onPagesChange, width]);
+  }, [file, height, darkMode, onLoadSuccess, onPagesChange, width]);
 
   if (error) {
     return (

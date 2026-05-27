@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 import PdfView, { type PdfViewHandle } from "@/components/PdfView";
@@ -48,6 +48,7 @@ function PerformancePage() {
   const activeSong = setlist[activeIdx];
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
+  const [darkMode, setDarkMode] = useState(true); // padrão ligado para palco
   const [color, setColor] = useState<string>("#00E5FF");
   const [drawings, setDrawings] = useState<DrawingMap>({});
 
@@ -343,6 +344,21 @@ function PerformancePage() {
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
+          {/* Dark Mode toggle */}
+          <button
+            type="button"
+            onClick={() => setDarkMode((d) => !d)}
+            className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
+              darkMode
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
+            }`}
+            aria-label={darkMode ? "Desativar modo escuro da cifra" : "Ativar modo escuro da cifra"}
+            title={darkMode ? "Modo escuro ON" : "Modo escuro OFF"}
+          >
+            {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          </button>
+
           {/* Tool: Pen */}
           <button
             type="button"
@@ -427,6 +443,7 @@ function PerformancePage() {
             file={pdfUrl}
             width={stageSize.width}
             height={stageSize.height}
+            darkMode={darkMode}
             onLoadSuccess={handlePdfLoadSuccess}
             onPagesChange={handlePagesChange}
           />
