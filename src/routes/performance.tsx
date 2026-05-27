@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
-import PdfView from "@/components/PdfView";
+import PdfView, { type PdfViewHandle } from "@/components/PdfView";
 
 
 
@@ -54,8 +54,10 @@ function PerformancePage() {
   // Container for PDF + canvas overlay
   const stageRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pdfRef = useRef<PdfViewHandle | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [pdfDims, setPdfDims] = useState<{ w: number; h: number } | null>(DEFAULT_PDF_DIMS);
+  const [pageInfo, setPageInfo] = useState<{ current: number; total: number }>({ current: 0, total: 1 });
 
   const handlePdfLoadSuccess = useCallback((d: { w: number; h: number }) => {
     setPdfDims((prev) => (
@@ -65,8 +67,10 @@ function PerformancePage() {
     ));
   }, []);
 
-  // Touch swipe state
-  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const handlePagesChange = useCallback((info: { current: number; total: number }) => {
+    setPageInfo(info);
+  }, []);
+
   const drawingRef = useRef(false);
   const currentStrokeRef = useRef<Stroke | null>(null);
 
@@ -153,13 +157,29 @@ function PerformancePage() {
     redraw();
   }, [redraw]);
 
-  // Navigation
+  // Navigation: prev/next moves through pages first, then between songs.
   const goPrev = useCallback(() => {
+    const info = pdfRef.current?.getPageInfo();
+    if (info && info.current > 0) {
+      pdfRef.current?.scrollByPages(-1);
+      return;
+    }
     setActiveIdx((i) => (i > 0 ? i - 1 : i));
   }, []);
   const goNext = useCallback(() => {
+    const info = pdfRef.current?.getPageInfo();
+    if (info && info.current < info.total - 1) {
+      pdfRef.current?.scrollByPages(1);
+      return;
+    }
     setActiveIdx((i) => (i < setlist.length - 1 ? i + 1 : i));
-  }, []);
+  }, [setlist.length]);
+
+  // Reset scroll to first page whenever the active song changes
+  useEffect(() => {
+    pdfRef.current?.scrollToStart();
+    setPageInfo({ current: 0, total: 1 });
+  }, [activeIdx]);
 
   // Keyboard nav
   useEffect(() => {
@@ -274,29 +294,6 @@ function PerformancePage() {
     setDrawings((prev) => ({ ...prev, [activeSong.id]: [] }));
   }
 
-  // ---------- Touch swipe (on side zones only) ----------
-  function onSwipeStart(e: React.TouchEvent) {
-    const t = e.touches[0];
-    touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
-  }
-  function onSwipeEnd(e: React.TouchEvent, fallback: () => void) {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start) {
-      fallback();
-      return;
-    }
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    const dt = Date.now() - start.t;
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && dt < 600) {
-      if (dx < 0) goNext();
-      else goPrev();
-    } else {
-      fallback();
-    }
-  }
 
   if (!activeSong) return null;
 
@@ -418,100 +415,96 @@ function PerformancePage() {
         </div>
       </div>
 
-      {/* Stage */}
+      {/* Stage — PDF pages flow horizontally (scroll-snap). Vertical scroll only
+          happens inside a single page if it overflows. */}
       <div
         ref={stageRef}
-        className="absolute inset-0 overflow-y-auto bg-black flex justify-center"
+        className="absolute inset-0 bg-black overflow-hidden"
       >
         {pdfUrl && stageSize.width > 0 && stageSize.height > 0 && (
-          <div
-            className="relative my-auto"
-            style={{ width: fitSize?.width ?? stageSize.width }}
-          >
-            <PdfView
-              file={pdfUrl}
-              width={fitSize?.width ?? stageSize.width}
-              height={fitSize?.height ?? stageSize.height}
-              onLoadSuccess={handlePdfLoadSuccess}
-            />
+          <PdfView
+            ref={pdfRef}
+            file={pdfUrl}
+            width={stageSize.width}
+            height={stageSize.height}
+            onLoadSuccess={handlePdfLoadSuccess}
+            onPagesChange={handlePagesChange}
+          />
+        )}
 
-            {/* Canvas overlay (first page only) - active when a tool is selected */}
-            {fitSize && tool !== null && (
-              <canvas
-                ref={canvasRef}
-                className="absolute top-0 left-0 touch-none"
-                style={{
-                  width: fitSize.width,
-                  height: fitSize.height,
-                  cursor: tool === "eraser" ? "cell" : "crosshair",
-                }}
-                onPointerDown={onPointerDown}
-                onPointerMove={onPointerMove}
-                onPointerUp={onPointerUp}
-                onPointerCancel={onPointerUp}
-              />
-            )}
+        {/* Drawing overlay — centered over the first page only.
+            Stays in viewport (not inside the scroll strip) so the user always
+            draws on a stable surface; pen marks apply to page 1. */}
+        {pdfUrl && fitSize && tool !== null && (
+          <canvas
+            ref={canvasRef}
+            className="absolute touch-none z-20"
+            style={{
+              width: fitSize.width,
+              height: fitSize.height,
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              cursor: tool === "eraser" ? "cell" : "crosshair",
+            }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          />
+        )}
 
-            {/* Render strokes (read-only) when not editing */}
-            {fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && (
-              <canvas
-                ref={canvasRef}
-                className="absolute top-0 left-0 pointer-events-none"
-                style={{ width: fitSize.width, height: fitSize.height }}
-              />
-            )}
-          </div>
+        {pdfUrl && fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && pageInfo.current === 0 && (
+          <canvas
+            ref={canvasRef}
+            className="absolute pointer-events-none z-20"
+            style={{
+              width: fitSize.width,
+              height: fitSize.height,
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
         )}
 
         {pdfMissing && (
-          <div className="max-w-md mx-6 text-center bg-card/90 border border-destructive/50 text-foreground rounded-lg p-6">
-            <p className="text-lg font-semibold text-destructive mb-2">
-              Arquivo PDF não encontrado
-            </p>
-            <p className="text-sm text-muted-foreground">
-              O upload desta cifra não está mais disponível no armazenamento
-              do navegador. Isso pode acontecer se os dados do site forem
-              limpos. Reenvie o PDF em "Músicas" para restaurá-lo.
-            </p>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="max-w-md mx-6 text-center bg-card/90 border border-destructive/50 text-foreground rounded-lg p-6">
+              <p className="text-lg font-semibold text-destructive mb-2">
+                Arquivo PDF não encontrado
+              </p>
+              <p className="text-sm text-muted-foreground">
+                O upload desta cifra não está mais disponível no armazenamento
+                do navegador. Isso pode acontecer se os dados do site forem
+                limpos. Reenvie o PDF em "Músicas" para restaurá-lo.
+              </p>
+            </div>
           </div>
         )}
-
-
       </div>
 
-      {/* Side swipe zones (keep gesture support, invisible) */}
-      <div
-        aria-hidden
-        onTouchStart={onSwipeStart}
-        onTouchEnd={(e) => onSwipeEnd(e, () => {})}
-        className="absolute top-0 bottom-0 left-0 w-[50px] z-10"
-      />
-      <div
-        aria-hidden
-        onTouchStart={onSwipeStart}
-        onTouchEnd={(e) => onSwipeEnd(e, () => {})}
-        className="absolute top-0 bottom-0 right-0 w-[50px] z-10"
-      />
-
-      {/* Visible navigation buttons */}
+      {/* Desktop-only navigation arrows. Hidden on touch devices via CSS
+          (.stage-arrow rule in styles.css) — touch users swipe horizontally. */}
       <button
         type="button"
-        aria-label="Música anterior"
+        aria-label="Página/música anterior"
         onClick={goPrev}
-        disabled={activeIdx === 0}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
+        disabled={activeIdx === 0 && pageInfo.current === 0}
+        className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
         <ChevronLeft className="h-7 w-7" />
       </button>
       <button
         type="button"
-        aria-label="Próxima música"
+        aria-label="Próxima página/música"
         onClick={goNext}
-        disabled={activeIdx >= setlist.length - 1}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
+        disabled={activeIdx >= setlist.length - 1 && pageInfo.current >= pageInfo.total - 1}
+        className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
         <ChevronRight className="h-7 w-7" />
       </button>
+
 
       {/* Usage hint (auto-hides) */}
       {showHint && setlist.length > 1 && (
