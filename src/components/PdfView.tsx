@@ -206,7 +206,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
       ref={containerRef}
       aria-label="PDF da cifra"
       className="absolute inset-0 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory pdf-scroll-x"
-      style={{ scrollbarWidth: "none" }}
+      style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
     />
   );
 });
