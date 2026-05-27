@@ -127,10 +127,8 @@
 /* Hide horizontal scrollbar on the PDF page strip */
 .pdf-scroll-x::-webkit-scrollbar { display: none; }
 
-/* Show stage navigation arrows only on devices with a fine pointer (desktop).
-   Hidden on touch devices (mobile & tablet) per UX spec — users swipe. */
-.stage-arrow { display: none; }
-@media (hover: hover) and (pointer: fine) {
-  .stage-arrow { display: inline-flex; }
-}
+/* Stage navigation arrows — visible on every device. Touch users can also
+   swipe horizontally within multi-page PDFs (native scroll-snap). Arrows
+   remain the reliable cross-platform way to advance between songs. */
+.stage-arrow { display: inline-flex; }
 
