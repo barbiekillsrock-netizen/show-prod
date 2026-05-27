@@ -298,28 +298,28 @@ function PerformancePage() {
   if (!activeSong) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background text-foreground select-none">
+    <div className="fixed inset-0 z-50 bg-black text-white select-none" data-performance>
       {/* Top bar */}
       <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 pointer-events-none">
         <button
           type="button"
           onClick={() => navigate({ to: exitTo })}
-          className="pointer-events-auto inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card"
+          className="pointer-events-auto inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />
           <span className="text-sm font-medium">Sair</span>
         </button>
 
-        <div className="pointer-events-auto px-4 py-2 rounded-lg bg-card/70 backdrop-blur border border-border text-center">
-          <p className="text-xs text-muted-foreground leading-none">{name}</p>
+        <div className="pointer-events-auto px-4 py-2 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-center">
+          <p className="text-xs text-white/40 leading-none">{name}</p>
           <p className="text-base font-semibold leading-tight mt-1">
             {activeSong.title}{" "}
-            <span className="text-muted-foreground font-normal">— {activeSong.artist}</span>{" "}
+            <span className="text-white/50 font-normal">— {activeSong.artist}</span>{" "}
             <span className="ml-2 inline-flex items-center justify-center min-w-[36px] h-6 px-2 rounded bg-primary text-primary-foreground text-xs font-bold align-middle">
               {activeSong.key}
             </span>
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-white/40 mt-0.5">
             {activeIdx + 1} / {setlist.length}
           </p>
           {setlist.length > 1 && (
@@ -334,7 +334,7 @@ function PerformancePage() {
                   className={`h-2 rounded-full transition-all ${
                     i === activeIdx
                       ? "w-6 bg-primary"
-                      : "w-2 bg-muted hover:bg-muted-foreground/60"
+                      : "w-2 bg-white/20 hover:bg-white/40"
                   }`}
                 />
               ))}
@@ -350,7 +350,7 @@ function PerformancePage() {
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "pen"
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card/70 border-border text-foreground hover:bg-card"
+                : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
             aria-label="Caneta"
             title="Caneta"
@@ -363,13 +363,13 @@ function PerformancePage() {
             <button
               type="button"
               onClick={() => setColor((c) => (c === "#00E5FF" ? "#FF0055" : "#00E5FF"))}
-              className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-border bg-card/70 backdrop-blur hover:bg-card relative"
+              className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur hover:bg-black/80 relative"
               aria-label="Trocar cor da caneta"
               title="Trocar cor"
             >
-              <Palette className="h-5 w-5 text-foreground" />
+              <Palette className="h-5 w-5 text-white/70" />
               <span
-                className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-background"
+                className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-black"
                 style={{ backgroundColor: color }}
               />
             </button>
@@ -382,7 +382,7 @@ function PerformancePage() {
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "eraser"
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card/70 border-border text-foreground hover:bg-card"
+                : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
             aria-label="Borracha"
             title="Borracha"
@@ -394,11 +394,11 @@ function PerformancePage() {
           <button
             type="button"
             onClick={clearStrokes}
-            className="inline-flex items-center gap-2 h-11 px-3 rounded-lg border border-border bg-card/70 backdrop-blur text-foreground hover:bg-destructive/20 hover:text-destructive hover:border-destructive/40"
+            className="inline-flex items-center gap-2 h-11 px-3 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/40 transition-colors"
             title="Limpar Traços"
           >
             <Trash2 className="h-4 w-4" />
-            <span className="text-sm font-medium">Limpar Traços</span>
+            <span className="text-sm font-medium">Limpar</span>
           </button>
 
           {/* Save - only when a tool is active */}
@@ -470,11 +470,11 @@ function PerformancePage() {
 
         {pdfMissing && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="max-w-md mx-6 text-center bg-card/90 border border-destructive/50 text-foreground rounded-lg p-6">
+            <div className="max-w-md mx-6 text-center bg-black/80 border border-red-500/30 text-white rounded-lg p-6">
               <p className="text-lg font-semibold text-destructive mb-2">
                 Arquivo PDF não encontrado
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white/50">
                 O upload desta cifra não está mais disponível no armazenamento
                 do navegador. Isso pode acontecer se os dados do site forem
                 limpos. Reenvie o PDF em "Músicas" para restaurá-lo.
@@ -491,7 +491,7 @@ function PerformancePage() {
         aria-label="Página/música anterior"
         onClick={goPrev}
         disabled={activeIdx === 0 && pageInfo.current === 0}
-        className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
+        className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
       >
         <ChevronLeft className="h-7 w-7" />
       </button>
@@ -500,7 +500,7 @@ function PerformancePage() {
         aria-label="Próxima página/música"
         onClick={goNext}
         disabled={activeIdx >= setlist.length - 1 && pageInfo.current >= pageInfo.total - 1}
-        className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-card/70 backdrop-blur border border-border text-foreground hover:bg-card disabled:opacity-30 disabled:cursor-not-allowed transition"
+        className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
       >
         <ChevronRight className="h-7 w-7" />
       </button>
@@ -508,14 +508,14 @@ function PerformancePage() {
 
       {/* Usage hint (auto-hides) */}
       {showHint && setlist.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 text-xs text-muted-foreground bg-card/80 backdrop-blur px-3 py-1.5 rounded-md border border-border">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10">
           Use as setas ← → do teclado, os botões laterais ou deslize para trocar de cifra
         </div>
       )}
 
       {/* End-of-show hint when on last */}
       {activeIdx === setlist.length - 1 && (
-        <div className="absolute bottom-4 right-4 z-30 text-xs text-muted-foreground bg-card/70 backdrop-blur px-3 py-1.5 rounded-md border border-border flex items-center gap-2">
+        <div className="absolute bottom-4 right-4 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 flex items-center gap-2">
           <X className="h-3 w-3" />
           Última música do show
         </div>
