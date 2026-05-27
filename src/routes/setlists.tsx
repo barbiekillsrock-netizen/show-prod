@@ -36,9 +36,6 @@ import {
   Share2,
 } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
-import { jsPDF } from "jspdf";
-import { getPdfBlob } from "@/lib/pdf-storage";
-import { buildDemoPdfBytes } from "@/lib/demo-pdf";
 import { useSetlists, setlistsStore, type Setlist } from "@/data/setlists";
 
 export const Route = createFileRoute("/setlists")({
@@ -54,6 +51,12 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   const validSongs = setlist.songIds
     .map((id) => songs.find((s) => s.id === id))
     .filter((s): s is Song => Boolean(s));
+
+  // Imports dinâmicos — só carregam no browser, não no SSR
+  const { jsPDF } = await import("jspdf");
+  const { PDFDocument, rgb } = await import("pdf-lib");
+  const { getPdfBlob } = await import("@/lib/pdf-storage");
+  const { buildDemoPdfBytes } = await import("@/lib/demo-pdf");
 
   // ── 1. Capa com jsPDF ────────────────────────────────────────────────────
   const cover = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -152,7 +155,6 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   const coverBytes = cover.output("arraybuffer");
 
   // ── 2. Merge nativo com pdf-lib ──────────────────────────────────────────
-  const { PDFDocument, rgb } = await import("pdf-lib");
   const merged = await PDFDocument.create();
 
   // Copia páginas da capa
