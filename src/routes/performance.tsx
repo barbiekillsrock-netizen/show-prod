@@ -349,36 +349,14 @@ function PerformancePage() {
           </button>
         </div>
 
-        <div className="pointer-events-auto px-4 py-2 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-center">
-          <p className="text-xs text-white/40 leading-none">{name}</p>
-          <p className="text-base font-semibold leading-tight mt-1">
-            {activeSong.title}{" "}
-            <span className="text-white/50 font-normal">— {activeSong.artist}</span>{" "}
-            <span className="ml-2 inline-flex items-center justify-center min-w-[36px] h-6 px-2 rounded bg-primary text-primary-foreground text-xs font-bold align-middle">
+        <div className="pointer-events-auto px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur border border-white/10 flex items-center gap-2">
+          {activeSong.key && (
+            <span className="inline-flex items-center justify-center px-2 h-6 rounded bg-primary text-primary-foreground text-xs font-bold shrink-0">
               {activeSong.key}
             </span>
-          </p>
-          <p className="text-xs text-white/40 mt-0.5">
-            {activeIdx + 1} / {setlist.length}
-          </p>
-          {setlist.length > 1 && (
-            <div className="mt-2 flex items-center justify-center gap-1.5">
-              {setlist.map((s, i) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setActiveIdx(i)}
-                  aria-label={`Ir para música ${i + 1}: ${s.title}`}
-                  title={`${i + 1}. ${s.title}`}
-                  className={`h-2 rounded-full transition-all ${
-                    i === activeIdx
-                      ? "w-6 bg-primary"
-                      : "w-2 bg-white/20 hover:bg-white/40"
-                  }`}
-                />
-              ))}
-            </div>
           )}
+          <span className="text-sm font-medium text-white truncate max-w-[180px]">{activeSong.title}</span>
+          <span className="text-xs text-white/40 shrink-0">{activeIdx + 1}/{setlist.length}</span>
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
