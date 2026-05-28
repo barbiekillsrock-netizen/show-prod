@@ -344,13 +344,11 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
     });
   }, [query, genreFilter, artistFilter, allSongs]);
 
-  // Artistas únicos do repertório para o select
   const artists = useMemo(() => {
     const set = new Set(allSongs.map((s) => s.artist).filter(Boolean));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [allSongs]);
 
-  // Gêneros que existem no repertório
   const activeGenres = useMemo(() => {
     const set = new Set(allSongs.map((s) => s.genre).filter(Boolean) as string[]);
     return GENRES.filter((g) => set.has(g));
@@ -516,18 +514,16 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
               </span>
             </div>
             <div className="space-y-2 mb-3 shrink-0">
-              {/* Busca */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar no repertório..."
+                  placeholder="Buscar por título, artista ou estilo..."
                   className="w-full h-10 pl-10 pr-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-              {/* Filtro por artista */}
               {artists.length > 0 && (
                 <select
                   value={artistFilter}
@@ -540,7 +536,6 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
                   ))}
                 </select>
               )}
-              {/* Chips de estilo */}
               {activeGenres.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {activeGenres.map((g) => (
