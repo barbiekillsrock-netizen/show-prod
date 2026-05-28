@@ -108,7 +108,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   doc.setTextColor(160, 160, 160);
   doc.text("Gerado por ShowProd", margin, 290);
 
-  // ── Cifras: cada página renderizada via pdfjs → canvas → jsPDF ───────────
+  // ── Cifras: cada página ocupa A4 inteira, cabeçalho discreto no topo ──────
   for (const song of validSongs) {
     try {
       let pdfBytes: ArrayBuffer;
@@ -126,36 +126,43 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
         doc.addPage();
         const page = await pdfDoc.getPage(pageNum);
 
-        // Renderiza na proporção exata da página A4 (595x842 pts = 210x297mm)
-        // scale alto para qualidade, depois redimensiona para página inteira
-        const A4_W_PT = 595;
-        const A4_H_PT = 842;
-        const viewport = page.getViewport({ scale: A4_W_PT / page.getViewport({ scale: 1 }).width });
+        // Calcula viewport para preencher A4 exato (595 x 842 pt)
+        const naturalVp = page.getViewport({ scale: 1 });
+        const scaleX = 595 / naturalVp.width;
+        const scaleY = 842 / naturalVp.height;
+        const scale = Math.max(scaleX, scaleY); // cobre a página inteira
+        const viewport = page.getViewport({ scale });
 
         const canvas = document.createElement("canvas");
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
         const ctx = canvas.getContext("2d")!;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        // Cabeçalho discreto na primeira página (faixa sobre a imagem)
+        // Cabeçalho: faixa preta no topo com texto ciano
+        // Altura = 3% da página — discreto mas legível
         if (pageNum === 1) {
-          const barH = Math.floor(canvas.height * 0.05); // 5% da altura
-          ctx.fillStyle = "rgba(10,10,10,0.85)";
+          const barH = Math.round(canvas.height * 0.032);
+          const parts = [
+            `${validSongs.indexOf(song) + 1}. ${song.title}`,
+            song.artist,
+            song.key ? `[${song.key}]` : "",
+            song.bpm ? `${song.bpm} BPM` : "",
+          ].filter(Boolean).join("  ·  ");
+
+          ctx.fillStyle = "rgba(0,0,0,0.82)";
           ctx.fillRect(0, 0, canvas.width, barH);
           ctx.fillStyle = "#00E5FF";
-          const fontSize = Math.floor(barH * 0.55);
-          ctx.font = `bold ${fontSize}px sans-serif`;
-          ctx.fillText(
-            `${validSongs.indexOf(song) + 1}. ${song.title}  —  ${song.artist}${song.key ? `  [${song.key}]` : ""}`,
-            Math.floor(canvas.width * 0.02),
-            Math.floor(barH * 0.72)
-          );
+          const fs = Math.round(barH * 0.52);
+          ctx.font = `600 ${fs}px sans-serif`;
+          ctx.fillText(parts, Math.round(canvas.width * 0.012), Math.round(barH * 0.72));
         }
 
-        // Ocupa a página A4 inteira — sem margens
-        const imgData = canvas.toDataURL("image/jpeg", 0.92);
-        doc.addImage(imgData, "JPEG", 0, 0, W, H);
+        // Página A4 inteira: x=0, y=0, largura=210mm, altura=297mm
+        const imgData = canvas.toDataURL("image/jpeg", 0.93);
+        doc.addImage(imgData, "JPEG", 0, 0, 210, 297);
       }
     } catch {
       // pula silenciosamente
