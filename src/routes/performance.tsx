@@ -323,7 +323,9 @@ function PerformancePage() {
   return (
     <div className="fixed inset-0 z-50 bg-black text-white select-none" data-performance>
       {/* Top bar */}
-      <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 pointer-events-none">
+      <div className="absolute top-0 inset-x-0 z-30 flex flex-col pointer-events-none">
+        {/* Linha 1: Sair + Cronômetro + Título */}
+        <div className="flex items-center justify-between px-3 py-2">
         <div className="pointer-events-auto flex items-center gap-2">
           <button
             type="button"
@@ -359,7 +361,10 @@ function PerformancePage() {
           <span className="text-xs text-white/40 shrink-0">{activeIdx + 1}/{setlist.length}</span>
         </div>
 
-        <div className="pointer-events-auto flex items-center gap-2">
+        </div>{/* fim linha 1 */}
+
+        {/* Linha 2: Ferramentas — scroll horizontal no mobile */}
+        <div className="flex items-center gap-2 px-3 pb-2 overflow-x-auto scrollbar-none pointer-events-auto">
           {/* Dark Mode toggle */}
           <button
             type="button"
@@ -438,13 +443,13 @@ function PerformancePage() {
             <button
               type="button"
               onClick={() => setTool(null)}
-              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg border border-primary bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
               title="Salvar edição"
             >
               <span className="text-sm font-semibold">Salvar</span>
             </button>
           )}
-        </div>
+        </div>{/* fim linha 2 */}
       </div>
 
       {/* Stage — PDF pages flow horizontally (scroll-snap). Vertical scroll only

@@ -70,8 +70,18 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const rawResponse = await handler.fetch(request, env, ctx);
+      const response = await normalizeCatastrophicSsrResponse(rawResponse);
+
+      // Remove restrições de screenshot e conteúdo seguro
+      const newHeaders = new Headers(response.headers);
+      newHeaders.delete("x-content-type-options");
+      newHeaders.set("Permissions-Policy", "screen-capture=*");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders,
+      });
     } catch (error) {
       console.error(error);
       return brandedErrorResponse();
