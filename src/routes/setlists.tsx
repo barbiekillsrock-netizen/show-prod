@@ -197,11 +197,20 @@ function RepertoireItem({ song, inSetlist }: { song: Song; inSetlist: boolean })
       <GripVertical className="h-5 w-5 text-muted-foreground shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-base font-medium text-foreground truncate">{song.title}</p>
-        <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+          {song.genre && (
+            <span className="inline-flex items-center px-1.5 h-4 rounded text-[10px] font-medium bg-[#2A2A2A] text-[#A3A3A3] shrink-0">
+              {song.genre}
+            </span>
+          )}
+        </div>
       </div>
-      <span className="inline-flex items-center justify-center min-w-[40px] h-7 px-2 rounded bg-primary/15 text-primary text-sm font-bold">
-        {song.key}
-      </span>
+      {song.key && (
+        <span className="inline-flex items-center justify-center min-w-[40px] h-7 px-2 rounded bg-primary/15 text-primary text-sm font-bold shrink-0">
+          {song.key}
+        </span>
+      )}
     </div>
   );
 }
