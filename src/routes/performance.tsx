@@ -467,17 +467,7 @@ function PerformancePage() {
             <span className="text-sm font-medium">Limpar</span>
           </button>
 
-          {/* Save - only when a tool is active */}
-          {tool !== null && (
-            <button
-              type="button"
-              onClick={() => setTool(null)}
-              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg border border-primary bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
-              title="Salvar edição"
-            >
-              <span className="text-sm font-semibold">Salvar</span>
-            </button>
-          )}
+
         </div>{/* fim linha 2 */}
       </div>
 
