@@ -2,8 +2,6 @@ import { Share2 } from "lucide-react";
 import type { Setlist } from "@/data/setlists";
 import type { Song } from "@/data/songs";
 
-const MINUTES_PER_SONG = 4;
-
 async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   const validSongs = setlist.songIds
     .map((id) => songs.find((s) => s.id === id))
@@ -44,15 +42,11 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   doc.text(setlist.name, margin, y);
   y += 7;
 
-  const total = validSongs.length * MINUTES_PER_SONG;
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  const durStr = h > 0 ? `${h}h ${String(m).padStart(2, "0")}min` : `${m}min`;
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 100, 100);
   doc.text(
-    `${validSongs.length} música${validSongs.length !== 1 ? "s" : ""}  •  ${durStr}  •  ${new Date().toLocaleDateString("pt-BR")}`,
+    `${validSongs.length} música${validSongs.length !== 1 ? "s" : ""}  •  ${new Date().toLocaleDateString("pt-BR")}`,
     margin, y
   );
   y += 8;

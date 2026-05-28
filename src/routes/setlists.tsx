@@ -45,15 +45,6 @@ export const Route = createFileRoute("/setlists")({
   component: SetlistsPage,
 });
 
-const MINUTES_PER_SONG = 4;
-
-function formatDuration(count: number) {
-  const total = count * MINUTES_PER_SONG;
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return h > 0 ? `${h}h ${m.toString().padStart(2, "0")}min` : `${m}min`;
-}
-
 /* ---------- Page router ---------- */
 function SetlistsPage() {
   const { id } = Route.useSearch();
@@ -489,13 +480,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
               <span className="text-foreground font-semibold">{setlist.length}</span>{" "}
               músicas
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-primary" />
-              <span className="text-foreground font-semibold">
-                {formatDuration(setlist.length)}
-              </span>{" "}
-              estimado
-            </span>
+
           </div>
         </div>
         <button
