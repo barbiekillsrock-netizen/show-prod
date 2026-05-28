@@ -104,14 +104,15 @@ function PerformancePage() {
     if (!ids) navigate({ to: exitTo });
   }, [ids, navigate]);
 
-  // Carrega anotações — usa cache em memória (imune a remontagens SSR)
+  // Carrega anotações do IndexedDB após mount
   useEffect(() => {
     const idList = ids.split(",").filter(Boolean);
     if (idList.length === 0) return;
-    const saved = loadDrawings(idList);
-    if (Object.keys(saved).length > 0) {
-      setDrawings(saved);
-    }
+    loadDrawings(idList).then((saved) => {
+      if (Object.keys(saved).length > 0) {
+        setDrawings(saved);
+      }
+    });
   }, [ids]);
 
   // Stage size
@@ -252,9 +253,8 @@ function PerformancePage() {
         ),
       );
       if (next.length === strokes.length) return prev;
-      const updated = { ...prev, [activeSong.id]: next };
-      saveDrawing(activeSong.id, next);
-      return updated;
+      void saveDrawing(activeSong.id, next);
+      return { ...prev, [activeSong.id]: next };
     });
   }
 
@@ -326,7 +326,7 @@ function PerformancePage() {
     setDrawings((prev) => {
       const existing = prev[activeSong.id] || [];
       const updated = [...existing, completedStroke];
-      saveDrawing(activeSong.id, updated);
+      void saveDrawing(activeSong.id, updated);
       return { ...prev, [activeSong.id]: updated };
     });
   }
