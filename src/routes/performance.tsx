@@ -164,7 +164,10 @@ function PerformancePage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const strokes = activeSong ? drawings[activeSong.id] || [] : [];
+    // Inclui stroke em progresso (do ref) no redraw
+    const savedStrokes = activeSong ? drawings[activeSong.id] || [] : [];
+    const inProgress = currentStrokeRef.current;
+    const strokes = inProgress ? [...savedStrokes, inProgress] : savedStrokes;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     for (const stroke of strokes) {
@@ -259,12 +262,8 @@ function PerformancePage() {
       eraseAt(pt);
       return;
     }
-    const stroke: Stroke = { tool: "pen", color, width: 3, points: [pt] };
-    currentStrokeRef.current = stroke;
-    setDrawings((prev) => ({
-      ...prev,
-      [activeSong.id]: [...(prev[activeSong.id] || []), stroke],
-    }));
+    // Cria o stroke no ref — só entra no state quando completo (onPointerUp)
+    currentStrokeRef.current = { tool: "pen", color, width: 3, points: [pt] };
   }
 
   function onPointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -305,18 +304,34 @@ function PerformancePage() {
   function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!drawingRef.current) return;
     drawingRef.current = false;
-    currentStrokeRef.current = null;
     try {
       (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId);
     } catch {
       // ignore
     }
-    // Commit final stroke state e persiste no localStorage
-    if (activeSong) {
+
+    // Salva o stroke completo (com todos os pontos do move) antes de zerar o ref
+    const completedStroke = currentStrokeRef.current;
+    currentStrokeRef.current = null;
+
+    if (activeSong && completedStroke && completedStroke.points.length > 1) {
       setDrawings((prev) => {
-        const strokes = prev[activeSong.id] || [];
-        saveDrawing(activeSong.id, strokes);
-        return prev;
+        // Substitui o stroke incompleto (1 ponto) pelo stroke completo
+        const existing = prev[activeSong.id] || [];
+        const updated = [
+          ...existing.slice(0, -1), // remove último (adicionado no pointerDown com 1 ponto)
+          completedStroke,           // adiciona o stroke completo
+        ];
+        saveDrawing(activeSong.id, updated);
+        return { ...prev, [activeSong.id]: updated };
+      });
+    } else if (activeSong && completedStroke && completedStroke.points.length <= 1) {
+      // Stroke muito curto (tap) — remove do state e não salva
+      setDrawings((prev) => {
+        const existing = prev[activeSong.id] || [];
+        const updated = existing.slice(0, -1);
+        saveDrawing(activeSong.id, updated);
+        return { ...prev, [activeSong.id]: updated };
       });
     }
   }
