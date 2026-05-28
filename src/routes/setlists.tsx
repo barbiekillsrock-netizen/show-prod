@@ -247,9 +247,11 @@ function SetlistItem({
         </p>
         <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
       </div>
-      <span className="inline-flex items-center justify-center min-w-[44px] h-8 px-2 rounded bg-primary text-primary-foreground text-sm font-bold">
-        {song.key}
-      </span>
+      {song.key && (
+        <span className="inline-flex items-center justify-center min-w-[44px] h-8 px-2 rounded bg-primary text-primary-foreground text-sm font-bold">
+          {song.key}
+        </span>
+      )}
       <button
         type="button"
         onClick={() => onRemove(song.id)}
