@@ -24,7 +24,6 @@ import {
   Search,
   GripVertical,
   Calendar,
-  Clock,
   Music2,
   X,
   Play,
@@ -138,12 +137,7 @@ function SetlistsIndex() {
                     </span>{" "}
                     músicas
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-foreground font-semibold">
-                      {formatDuration(valid.length)}
-                    </span>
-                  </span>
+
                 </div>
                 <div className="flex gap-2 mt-auto">
                   <button
