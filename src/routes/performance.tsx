@@ -357,6 +357,11 @@ function PerformancePage() {
               {activeSong.key}
             </span>
           )}
+          {activeSong.bpm && (
+            <span className="inline-flex items-center justify-center px-2 h-6 rounded bg-[#2A2A2A] text-[#A3A3A3] text-xs font-medium shrink-0">
+              {activeSong.bpm} BPM
+            </span>
+          )}
           <span className="text-sm font-medium text-white truncate max-w-[180px]">{activeSong.title}</span>
           <span className="text-xs text-white/40 shrink-0">{activeIdx + 1}/{setlist.length}</span>
         </div>

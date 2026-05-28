@@ -56,6 +56,11 @@ export function SongCard({ song }: { song: Song }) {
               {song.key}
             </span>
           )}
+          {song.bpm && (
+            <span className="inline-flex items-center justify-center px-2.5 h-6 rounded-md bg-[#2A2A2A] text-[#A3A3A3] font-medium text-xs">
+              {song.bpm} BPM
+            </span>
+          )}
           {song.genre && (
             <span className="inline-flex items-center justify-center px-2.5 h-6 rounded-md bg-[#2A2A2A] text-[#A3A3A3] font-medium text-xs">
               {song.genre}

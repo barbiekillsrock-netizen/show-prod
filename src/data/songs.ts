@@ -34,6 +34,7 @@ export type Song = {
   artist: string;
   key: string;
   genre?: string;
+  bpm?: number;
   hasPdf?: boolean;
   pdfName?: string;
 };
@@ -122,6 +123,7 @@ export const songsStore = {
       artist: song.artist,
       key: normalizeKey(song.key),
       genre: song.genre,
+      bpm: song.bpm,
       pdfName: pdfFile?.name,
       hasPdf: false,
     };
@@ -157,6 +159,7 @@ export const songsStore = {
       ...existing,
       ...patch,
       key: patch.key !== undefined ? normalizeKey(patch.key) : existing.key,
+      bpm: patch.bpm !== undefined ? patch.bpm : existing.bpm,
     };
     if (pdfFile) {
       try {

@@ -19,6 +19,7 @@ export function AddSongDialog({
   const [keySuggestions, setKeySuggestions] = useState<string[]>([]);
   const [genre, setGenre] = useState(song?.genre ?? "");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
   const [customGenre, setCustomGenre] = useState(song?.genre && !GENRES.slice(0,-1).includes(song.genre) && song.genre !== "Outro" ? song.genre : "");
   const [dragOver, setDragOver] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -36,6 +37,7 @@ export function AddSongDialog({
     setKeyTouched(false);
     setKeySuggestions([]);
     setGenre(song?.genre ?? "");
+    setBpm(song?.bpm ? String(song.bpm) : "");
     setPdfFile(null);
     setCustomGenre("");
   }
@@ -86,6 +88,7 @@ export function AddSongDialog({
           artist: artist.trim(),
           key: songKey.trim() ? normalizeKey(songKey) : "",
           genre: genre === "Outro" ? (customGenre.trim() || "Outro") : (genre || undefined),
+        bpm: bpm.trim() ? Number(bpm) : undefined,
         },
         pdfFile,
       );
@@ -233,6 +236,23 @@ export function AddSongDialog({
                 Tom inválido. Ex: Am, C#, Bb
               </p>
             )}
+          </div>
+
+          {/* BPM */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              BPM{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
+            </label>
+            <input
+              type="number"
+              min="40"
+              max="300"
+              value={bpm}
+              onChange={(e) => setBpm(e.target.value)}
+              placeholder="Ex.: 120"
+              className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
           </div>
 
           {/* PDF */}
