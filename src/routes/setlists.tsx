@@ -536,8 +536,9 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
                   ))}
                 </select>
               )}
-              <div className="flex flex-wrap gap-1.5">
-                  {GENRES.filter(g => g !== "Outro").map((g) => (
+              {activeGenres.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {activeGenres.map((g) => (
                     <button
                       key={g}
                       type="button"
@@ -561,6 +562,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
                     </button>
                   )}
                 </div>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {filtered.map((song) => (
