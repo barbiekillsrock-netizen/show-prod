@@ -104,13 +104,11 @@ function PerformancePage() {
     if (!ids) navigate({ to: exitTo });
   }, [ids, navigate]);
 
-  // Carrega anotações salvas após mount (garante que window está disponível)
+  // Carrega anotações — usa cache em memória (imune a remontagens SSR)
   useEffect(() => {
     const idList = ids.split(",").filter(Boolean);
-    console.log("[drawings] loading for ids:", idList);
     if (idList.length === 0) return;
     const saved = loadDrawings(idList);
-    console.log("[drawings] loaded from storage:", JSON.stringify(saved).slice(0, 200));
     if (Object.keys(saved).length > 0) {
       setDrawings(saved);
     }
@@ -328,11 +326,7 @@ function PerformancePage() {
     setDrawings((prev) => {
       const existing = prev[activeSong.id] || [];
       const updated = [...existing, completedStroke];
-      console.log("[drawings] saving stroke, points:", completedStroke.points.length, "total strokes:", updated.length);
       saveDrawing(activeSong.id, updated);
-      // Verifica se realmente salvou
-      const check = window.localStorage.getItem("drawings:" + activeSong.id);
-      console.log("[drawings] localStorage after save:", check ? check.slice(0, 100) : "NULL");
       return { ...prev, [activeSong.id]: updated };
     });
   }
