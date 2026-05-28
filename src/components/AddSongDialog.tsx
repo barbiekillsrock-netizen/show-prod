@@ -19,6 +19,7 @@ export function AddSongDialog({
   const [keySuggestions, setKeySuggestions] = useState<string[]>([]);
   const [genre, setGenre] = useState(song?.genre ?? "");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [customGenre, setCustomGenre] = useState(song?.genre && !GENRES.slice(0,-1).includes(song.genre) && song.genre !== "Outro" ? song.genre : "");
   const [dragOver, setDragOver] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -36,6 +37,7 @@ export function AddSongDialog({
     setKeySuggestions([]);
     setGenre(song?.genre ?? "");
     setPdfFile(null);
+    setCustomGenre("");
   }
 
   function handleKeyChange(val: string) {
@@ -83,7 +85,7 @@ export function AddSongDialog({
           title: title.trim(),
           artist: artist.trim(),
           key: songKey.trim() ? normalizeKey(songKey) : "",
-          genre: genre || undefined,
+          genre: genre === "Outro" ? (customGenre.trim() || "Outro") : (genre || undefined),
         },
         pdfFile,
       );
@@ -168,7 +170,7 @@ export function AddSongDialog({
             <div className="relative">
               <select
                 value={genre}
-                onChange={(e) => setGenre(e.target.value)}
+                onChange={(e) => { setGenre(e.target.value); if (e.target.value !== "Outro") setCustomGenre(""); }}
                 className="w-full h-12 pl-4 pr-10 rounded-lg bg-background border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
               >
                 <option value="">Selecione um estilo...</option>
@@ -178,6 +180,15 @@ export function AddSongDialog({
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             </div>
+            {genre === "Outro" && (
+              <input
+                autoFocus
+                value={customGenre}
+                onChange={(e) => setCustomGenre(e.target.value)}
+                placeholder="Digite o estilo..."
+                className="mt-2 w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            )}
           </div>
 
           {/* Tom */}

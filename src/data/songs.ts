@@ -7,7 +7,7 @@ export const VALID_KEYS = [
 ];
 
 export const GENRES = [
-  "Rock", "Pop", "Sertanejo", "Pagode", "Samba", "MPB", "Forró", "Gospel",
+  "Rock", "Pop", "Rock Pop", "Pop Rock", "Sertanejo", "Pagode", "Samba", "MPB", "Forró", "Gospel",
   "Blues", "Jazz", "Soul/Funk", "R&B", "Hip-Hop", "Eletrônico", "Reggae",
   "Clássico", "Bossa Nova", "Axé", "Funk", "Metal", "Outro",
 ];
