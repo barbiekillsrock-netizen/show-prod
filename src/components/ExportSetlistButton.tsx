@@ -125,35 +125,37 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
       for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         doc.addPage();
         const page = await pdfDoc.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2.0 });
+
+        // Renderiza na proporção exata da página A4 (595x842 pts = 210x297mm)
+        // scale alto para qualidade, depois redimensiona para página inteira
+        const A4_W_PT = 595;
+        const A4_H_PT = 842;
+        const viewport = page.getViewport({ scale: A4_W_PT / page.getViewport({ scale: 1 }).width });
 
         const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
         const ctx = canvas.getContext("2d")!;
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        // Cabeçalho da música na primeira página
+        // Cabeçalho discreto na primeira página (faixa sobre a imagem)
         if (pageNum === 1) {
-          ctx.fillStyle = "rgba(10,10,10,0.88)";
-          ctx.fillRect(0, 0, canvas.width, 36);
+          const barH = Math.floor(canvas.height * 0.05); // 5% da altura
+          ctx.fillStyle = "rgba(10,10,10,0.85)";
+          ctx.fillRect(0, 0, canvas.width, barH);
           ctx.fillStyle = "#00E5FF";
-          ctx.font = "bold 18px helvetica";
+          const fontSize = Math.floor(barH * 0.55);
+          ctx.font = `bold ${fontSize}px sans-serif`;
           ctx.fillText(
             `${validSongs.indexOf(song) + 1}. ${song.title}  —  ${song.artist}${song.key ? `  [${song.key}]` : ""}`,
-            16, 24
+            Math.floor(canvas.width * 0.02),
+            Math.floor(barH * 0.72)
           );
         }
 
-        const ratio = viewport.width / viewport.height;
-        const availW = W - margin * 2;
-        const availH = H - margin * 2;
-        let imgW = availW;
-        let imgH = imgW / ratio;
-        if (imgH > availH) { imgH = availH; imgW = imgH * ratio; }
-
-        const imgData = canvas.toDataURL("image/jpeg", 0.95);
-        doc.addImage(imgData, "JPEG", (W - imgW) / 2, (H - imgH) / 2, imgW, imgH);
+        // Ocupa a página A4 inteira — sem margens
+        const imgData = canvas.toDataURL("image/jpeg", 0.92);
+        doc.addImage(imgData, "JPEG", 0, 0, W, H);
       }
     } catch {
       // pula silenciosamente
