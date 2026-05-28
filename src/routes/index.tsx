@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, ArrowUpDown } from "lucide-react";
 import { useSongs, GENRES } from "@/data/songs";
 import { SongCard } from "@/components/SongCard";
 import { AddSongDialog } from "@/components/AddSongDialog";
@@ -15,6 +15,7 @@ function SongsPage() {
   const songs = useSongs();
   const [query, setQuery] = useState("");
   const [genreFilter, setGenreFilter] = useState("");
+  const [sortBy, setSortBy] = useState<"default" | "title" | "artist" | "key">("default");
   const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
@@ -41,15 +42,20 @@ function SongsPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return songs.filter((s) => {
+    const list = songs.filter((s) => {
       const matchesQuery = !q ||
         s.title.toLowerCase().includes(q) ||
         s.artist.toLowerCase().includes(q) ||
-        s.key.toLowerCase().includes(q);
+        (s.key ?? "").toLowerCase().includes(q) ||
+        (s.genre ?? "").toLowerCase().includes(q);
       const matchesGenre = !genreFilter || s.genre === genreFilter;
       return matchesQuery && matchesGenre;
     });
-  }, [query, genreFilter, songs]);
+    if (sortBy === "title") return [...list].sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "artist") return [...list].sort((a, b) => a.artist.localeCompare(b.artist));
+    if (sortBy === "key") return [...list].sort((a, b) => (a.key ?? "").localeCompare(b.key ?? ""));
+    return list;
+  }, [query, genreFilter, sortBy, songs]);
 
   // Gêneros que existem no repertório atual
   const activeGenres = useMemo(() => {
@@ -78,14 +84,26 @@ function SongsPage() {
           />
         </div>
 
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity min-h-[48px]"
-        >
-          <Plus className="h-5 w-5" strokeWidth={3} />
-          Adicionar Nova Cifra
-        </button>
+        <div className="flex gap-2">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="h-14 px-4 rounded-lg bg-card border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="default">Ordem padrão</option>
+            <option value="title">A-Z título</option>
+            <option value="artist">A-Z artista</option>
+            <option value="key">Por tom</option>
+          </select>
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="inline-flex items-center justify-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity min-h-[48px]"
+          >
+            <Plus className="h-5 w-5" strokeWidth={3} />
+            Adicionar Nova Cifra
+          </button>
+        </div>
       </div>
 
       {/* Filtro por estilo */}
