@@ -78,7 +78,7 @@ function SetlistsIndex() {
   }
 
   return (
-    <div className="p-8 lg:p-10 h-screen flex flex-col">
+    <div className="p-4 md:p-8 lg:p-10 h-screen flex flex-col">
       <header className="mb-8 shrink-0 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-foreground">Setlists de Shows</h2>
@@ -310,6 +310,7 @@ function SetlistDropArea({
 function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
   const navigate = useNavigate();
   const allSongs = useSongs();
+  const [activeTab, setActiveTab] = useState<"repertoire" | "setlist">("repertoire");
   const [query, setQuery] = useState("");
   const [genreFilter, setGenreFilter] = useState("");
   const [artistFilter, setArtistFilter] = useState("");
@@ -425,7 +426,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
   }
 
   return (
-    <div className="p-8 lg:p-10 h-screen flex flex-col">
+    <div className="p-4 md:p-8 lg:p-10 h-screen flex flex-col">
       <header className="mb-6 shrink-0 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <button
@@ -469,11 +470,11 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
               }}
               className="group inline-flex items-center gap-2 text-left"
             >
-              <h2 className="text-3xl font-bold text-foreground">{meta.name}</h2>
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">{meta.name}</h2>
               <Pencil className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
             </button>
           )}
-          <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
+          <div className="mt-1 md:mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
               Criado em {new Date(meta.createdAt).toLocaleDateString("pt-BR")}
@@ -490,7 +491,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
           type="button"
           onClick={startShow}
           disabled={setlist.length === 0}
-          className="inline-flex items-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-bold text-base hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+          className="inline-flex items-center gap-2 h-11 md:h-14 px-4 md:px-6 rounded-lg bg-primary text-primary-foreground font-bold text-sm md:text-base hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-primary/20 shrink-0"
         >
           <Play className="h-5 w-5 fill-current" />
           Iniciar Show
@@ -507,8 +508,34 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
           setActiveSource(null);
         }}
       >
-        <div className="flex-1 grid grid-cols-2 gap-6 min-h-0">
-          <section className="flex flex-col bg-card/30 rounded-2xl border border-border p-5 min-h-0">
+        {/* Abas mobile */}
+        <div className="md:hidden flex mb-3 shrink-0 bg-card rounded-xl border border-border p-1 gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab("repertoire")}
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "repertoire"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Repertório ({filtered.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("setlist")}
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "setlist"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Roteiro ({setlist.length})
+          </button>
+        </div>
+
+        <div className="flex-1 grid md:grid-cols-2 gap-6 min-h-0">
+          <section className={`flex-col bg-card/30 rounded-2xl border border-border p-5 min-h-0 ${activeTab === "repertoire" ? "flex" : "hidden md:flex"}`}>
             <div className="flex items-center justify-between mb-4 shrink-0">
               <h3 className="text-xl font-bold text-foreground">Meu Repertório</h3>
               <span className="text-sm text-muted-foreground">
