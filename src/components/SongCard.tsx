@@ -95,7 +95,7 @@ export function SongCard({ song }: { song: Song }) {
       {/* Dialog de edição */}
       <AddSongDialog open={editOpen} onClose={() => setEditOpen(false)} song={song} />
 
-      {/* Modal de confirmação de delete */}}
+      {/* Modal de confirmação de delete */}
       {confirmDelete && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"
