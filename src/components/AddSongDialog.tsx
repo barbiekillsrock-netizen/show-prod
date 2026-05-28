@@ -17,10 +17,12 @@ export function AddSongDialog({
   const [songKey, setSongKey] = useState(song?.key ?? "");
   const [keyTouched, setKeyTouched] = useState(false);
   const [keySuggestions, setKeySuggestions] = useState<string[]>([]);
-  const [genre, setGenre] = useState(song?.genre ?? "");
+  // Se o genre da música não está na lista GENRES, é customizado
+  const isCustomGenre = Boolean(song?.genre && !GENRES.includes(song.genre));
+  const [genre, setGenre] = useState(isCustomGenre ? "Outro" : (song?.genre ?? ""));
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
-  const [customGenre, setCustomGenre] = useState(song?.genre && !GENRES.slice(0,-1).includes(song.genre) && song.genre !== "Outro" ? song.genre : "");
+  const [customGenre, setCustomGenre] = useState(isCustomGenre ? (song?.genre ?? "") : "");
   const [dragOver, setDragOver] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -36,10 +38,11 @@ export function AddSongDialog({
     setSongKey(song?.key ?? "");
     setKeyTouched(false);
     setKeySuggestions([]);
-    setGenre(song?.genre ?? "");
+    const _isCustom = Boolean(song?.genre && !GENRES.includes(song.genre));
+    setGenre(_isCustom ? "Outro" : (song?.genre ?? ""));
     setBpm(song?.bpm ? String(song.bpm) : "");
     setPdfFile(null);
-    setCustomGenre("");
+    setCustomGenre(_isCustom ? (song?.genre ?? "") : "");
   }
 
   function handleKeyChange(val: string) {

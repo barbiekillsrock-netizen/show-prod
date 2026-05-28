@@ -503,36 +503,29 @@ function PerformancePage() {
         {/* Drawing overlay — centered over the first page only.
             Stays in viewport (not inside the scroll strip) so the user always
             draws on a stable surface; pen marks apply to page 1. */}
-        {pdfUrl && fitSize && tool !== null && (
+        {/* Canvas unificado: ativo no modo desenho, passivo no modo leitura.
+            Sempre visível quando há PDF carregado — anotações aparecem em
+            qualquer página (o redraw usa drawings do state). */}
+        {pdfUrl && fitSize && activeSong && (
+          tool !== null || (drawings[activeSong.id]?.length ?? 0) > 0
+        ) && (
           <canvas
             ref={canvasRef}
-            className="absolute touch-none z-20"
+            className="absolute z-20"
             style={{
               width: fitSize.width,
               height: fitSize.height,
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              cursor: tool === "eraser" ? "cell" : "crosshair",
+              cursor: tool === "eraser" ? "cell" : tool === "pen" ? "crosshair" : "default",
+              pointerEvents: tool !== null ? "auto" : "none",
+              touchAction: tool !== null ? "none" : "auto",
             }}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
-          />
-        )}
-
-        {pdfUrl && fitSize && tool === null && activeSong && (drawings[activeSong.id]?.length ?? 0) > 0 && pageInfo.current === 0 && (
-          <canvas
-            ref={canvasRef}
-            className="absolute pointer-events-none z-20"
-            style={{
-              width: fitSize.width,
-              height: fitSize.height,
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
+            onPointerDown={tool !== null ? onPointerDown : undefined}
+            onPointerMove={tool !== null ? onPointerMove : undefined}
+            onPointerUp={tool !== null ? onPointerUp : undefined}
+            onPointerCancel={tool !== null ? onPointerUp : undefined}
           />
         )}
 
