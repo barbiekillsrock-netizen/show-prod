@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Clock, Pause, Play } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
-import { loadDrawings, saveDrawing, clearDrawing } from "@/lib/drawings-storage";
+import { loadDrawing, loadDrawings, saveDrawing, clearDrawing } from "@/lib/drawings-storage";
 import PdfView, { type PdfViewHandle } from "@/components/PdfView";
 
 
@@ -104,16 +104,27 @@ function PerformancePage() {
     if (!ids) navigate({ to: exitTo });
   }, [ids, navigate]);
 
-  // Carrega anotações do IndexedDB após mount
+  // Carrega anotações do IndexedDB após mount (todas as músicas do show)
   useEffect(() => {
     const idList = ids.split(",").filter(Boolean);
     if (idList.length === 0) return;
     loadDrawings(idList).then((saved) => {
-      if (Object.keys(saved).length > 0) {
-        setDrawings(saved);
-      }
+      setDrawings((prev) => ({ ...prev, ...saved }));
     });
   }, [ids]);
+
+  // Quando muda de música ativa, garante que drawings dessa música estão carregados
+  useEffect(() => {
+    if (!activeSong) return;
+    loadDrawing(activeSong.id).then((strokes) => {
+      if (strokes.length > 0) {
+        setDrawings((prev) => {
+          if (prev[activeSong.id]?.length === strokes.length) return prev;
+          return { ...prev, [activeSong.id]: strokes };
+        });
+      }
+    });
+  }, [activeSong?.id]);
 
   // Stage size
   useEffect(() => {
