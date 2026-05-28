@@ -73,12 +73,7 @@ function PerformancePage() {
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
   const [color, setColor] = useState<string>("#00E5FF");
-  const [drawings, setDrawings] = useState<DrawingMap>(() => {
-    // Carrega anotações salvas ao entrar no modo performance
-    if (typeof window === "undefined") return {};
-    const idList = (typeof ids === "string" ? ids : "").split(",").filter(Boolean);
-    return loadDrawings(idList);
-  });
+  const [drawings, setDrawings] = useState<DrawingMap>({});
 
   // Container for PDF + canvas overlay
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -108,6 +103,16 @@ function PerformancePage() {
   useEffect(() => {
     if (!ids) navigate({ to: exitTo });
   }, [ids, navigate]);
+
+  // Carrega anotações salvas após mount (garante que window está disponível)
+  useEffect(() => {
+    const idList = ids.split(",").filter(Boolean);
+    if (idList.length === 0) return;
+    const saved = loadDrawings(idList);
+    if (Object.keys(saved).length > 0) {
+      setDrawings(saved);
+    }
+  }, [ids]);
 
   // Stage size
   useEffect(() => {
@@ -247,7 +252,9 @@ function PerformancePage() {
         ),
       );
       if (next.length === strokes.length) return prev;
-      return { ...prev, [activeSong.id]: next };
+      const updated = { ...prev, [activeSong.id]: next };
+      saveDrawing(activeSong.id, next);
+      return updated;
     });
   }
 
@@ -310,30 +317,18 @@ function PerformancePage() {
       // ignore
     }
 
-    // Salva o stroke completo (com todos os pontos do move) antes de zerar o ref
     const completedStroke = currentStrokeRef.current;
     currentStrokeRef.current = null;
 
-    if (activeSong && completedStroke && completedStroke.points.length > 1) {
-      setDrawings((prev) => {
-        // Substitui o stroke incompleto (1 ponto) pelo stroke completo
-        const existing = prev[activeSong.id] || [];
-        const updated = [
-          ...existing.slice(0, -1), // remove último (adicionado no pointerDown com 1 ponto)
-          completedStroke,           // adiciona o stroke completo
-        ];
-        saveDrawing(activeSong.id, updated);
-        return { ...prev, [activeSong.id]: updated };
-      });
-    } else if (activeSong && completedStroke && completedStroke.points.length <= 1) {
-      // Stroke muito curto (tap) — remove do state e não salva
-      setDrawings((prev) => {
-        const existing = prev[activeSong.id] || [];
-        const updated = existing.slice(0, -1);
-        saveDrawing(activeSong.id, updated);
-        return { ...prev, [activeSong.id]: updated };
-      });
-    }
+    // Só salva strokes com pelo menos 2 pontos (traço real, não tap)
+    if (!activeSong || !completedStroke || completedStroke.points.length < 2) return;
+
+    setDrawings((prev) => {
+      const existing = prev[activeSong.id] || [];
+      const updated = [...existing, completedStroke];
+      saveDrawing(activeSong.id, updated);
+      return { ...prev, [activeSong.id]: updated };
+    });
   }
 
   // Clear current song drawings
