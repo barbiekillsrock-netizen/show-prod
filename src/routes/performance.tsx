@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Clock, Pause, Play } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
+import { loadDrawings, saveDrawing, clearDrawing } from "@/lib/drawings-storage";
 import PdfView, { type PdfViewHandle } from "@/components/PdfView";
 
 
@@ -72,7 +73,12 @@ function PerformancePage() {
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
   const [color, setColor] = useState<string>("#00E5FF");
-  const [drawings, setDrawings] = useState<DrawingMap>({});
+  const [drawings, setDrawings] = useState<DrawingMap>(() => {
+    // Carrega anotações salvas ao entrar no modo performance
+    if (typeof window === "undefined") return {};
+    const idList = (typeof ids === "string" ? ids : "").split(",").filter(Boolean);
+    return loadDrawings(idList);
+  });
 
   // Container for PDF + canvas overlay
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -305,7 +311,14 @@ function PerformancePage() {
     } catch {
       // ignore
     }
-    // Commit final stroke state (already in drawings)
+    // Commit final stroke state e persiste no localStorage
+    if (activeSong) {
+      setDrawings((prev) => {
+        const strokes = prev[activeSong.id] || [];
+        saveDrawing(activeSong.id, strokes);
+        return prev;
+      });
+    }
   }
 
   // Clear current song drawings
@@ -314,6 +327,7 @@ function PerformancePage() {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    clearDrawing(activeSong.id);
     setDrawings((prev) => ({ ...prev, [activeSong.id]: [] }));
   }
 
