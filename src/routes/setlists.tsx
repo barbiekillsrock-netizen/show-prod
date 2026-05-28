@@ -34,7 +34,7 @@ import {
   ChevronLeft,
   Check,
 } from "lucide-react";
-import { useSongs, type Song } from "@/data/songs";
+import { useSongs, GENRES, type Song } from "@/data/songs";
 import { ExportSetlistButton } from "@/components/ExportSetlistButton";
 import { useSetlists, setlistsStore, type Setlist } from "@/data/setlists";
 
@@ -315,6 +315,8 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
   const navigate = useNavigate();
   const allSongs = useSongs();
   const [query, setQuery] = useState("");
+  const [genreFilter, setGenreFilter] = useState("");
+  const [artistFilter, setArtistFilter] = useState("");
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(meta.name);
 
@@ -337,12 +339,28 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return allSongs;
-    return allSongs.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q),
-    );
-  }, [query, allSongs]);
+    return allSongs.filter((s) => {
+      const matchesQuery = !q ||
+        s.title.toLowerCase().includes(q) ||
+        s.artist.toLowerCase().includes(q) ||
+        (s.genre ?? "").toLowerCase().includes(q);
+      const matchesGenre = !genreFilter || s.genre === genreFilter;
+      const matchesArtist = !artistFilter || s.artist === artistFilter;
+      return matchesQuery && matchesGenre && matchesArtist;
+    });
+  }, [query, genreFilter, artistFilter, allSongs]);
+
+  // Artistas únicos do repertório para o select
+  const artists = useMemo(() => {
+    const set = new Set(allSongs.map((s) => s.artist).filter(Boolean));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [allSongs]);
+
+  // Gêneros que existem no repertório
+  const activeGenres = useMemo(() => {
+    const set = new Set(allSongs.map((s) => s.genre).filter(Boolean) as string[]);
+    return GENRES.filter((g) => set.has(g));
+  }, [allSongs]);
 
   function update(songs: Song[]) {
     setlistsStore.setSongs(
@@ -509,15 +527,59 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
                 {filtered.length} músicas
               </span>
             </div>
-            <div className="relative mb-4 shrink-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar no repertório..."
-                className="w-full h-11 pl-10 pr-3 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+            <div className="space-y-2 mb-3 shrink-0">
+              {/* Busca */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar no repertório..."
+                  className="w-full h-10 pl-10 pr-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              {/* Filtro por artista */}
+              {artists.length > 0 && (
+                <select
+                  value={artistFilter}
+                  onChange={(e) => setArtistFilter(e.target.value)}
+                  className="w-full h-9 px-3 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">Todos os artistas</option>
+                  {artists.map((a) => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                </select>
+              )}
+              {/* Chips de estilo */}
+              {activeGenres.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {activeGenres.map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setGenreFilter(genreFilter === g ? "" : g)}
+                      className={`h-6 px-2.5 rounded-full text-xs font-medium transition-colors ${
+                        genreFilter === g
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card border border-border text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                  {(genreFilter || artistFilter) && (
+                    <button
+                      type="button"
+                      onClick={() => { setGenreFilter(""); setArtistFilter(""); }}
+                      className="h-6 px-2.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground hover:text-foreground"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {filtered.map((song) => (
