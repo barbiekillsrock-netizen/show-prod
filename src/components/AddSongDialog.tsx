@@ -80,7 +80,9 @@ export function AddSongDialog({
       return;
     }
     // Se está editando e já tem PDF cadastrado, pede confirmação
-    if (isEditing && song?.hasPdf) {
+    // Verifica tanto hasPdf quanto pdfName (músicas antigas podem não ter hasPdf)
+    const songHasPdf = Boolean(isEditing && (song?.hasPdf || song?.pdfName));
+    if (songHasPdf) {
       setPendingPdfFile(file);
       setShowPdfConfirm(true);
     } else {
