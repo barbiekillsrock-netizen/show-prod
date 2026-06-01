@@ -79,8 +79,8 @@ export function AddSongDialog({
       alert("Por favor, selecione um arquivo PDF.");
       return;
     }
-    // Se está editando e já tem PDF, pede confirmação
-    if (isEditing && song?.hasPdf && !pdfFile) {
+    // Se está editando e já tem PDF cadastrado, pede confirmação
+    if (isEditing && song?.hasPdf) {
       setPendingPdfFile(file);
       setShowPdfConfirm(true);
     } else {
