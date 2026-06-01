@@ -55,7 +55,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
         const total = Math.max(1, Math.round(el.scrollWidth / cw));
         const current = Math.round(el.scrollLeft / cw);
         const target = Math.min(total - 1, Math.max(0, current + delta));
-        el.scrollTo({ left: target * cw, behavior: "smooth" });
+        el.scrollTo({ left: target * cw, behavior: "instant" });
       },
       scrollToStart() {
         const el = containerRef.current;
@@ -208,7 +208,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
       ref={containerRef}
       aria-label="PDF da cifra"
       className="absolute inset-0 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory pdf-scroll-x"
-      style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
+      style={{ scrollbarWidth: "none", touchAction: "pan-x", scrollBehavior: "auto" }}
     />
   );
 });
