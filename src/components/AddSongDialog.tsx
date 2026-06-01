@@ -124,6 +124,7 @@ export function AddSongDialog({
   }
 
   return (
+    <>
     {/* Modal de confirmação de troca de PDF */}
     {showPdfConfirm && (
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
@@ -382,5 +383,6 @@ export function AddSongDialog({
         </form>
       </div>
     </div>
+    </>
   );
 }
