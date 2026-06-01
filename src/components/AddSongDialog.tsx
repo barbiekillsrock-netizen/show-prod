@@ -21,6 +21,8 @@ export function AddSongDialog({
   const isCustomGenre = Boolean(song?.genre && !GENRES.includes(song.genre));
   const [genre, setGenre] = useState(isCustomGenre ? "Outro" : (song?.genre ?? ""));
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pendingPdfFile, setPendingPdfFile] = useState<File | null>(null);
+  const [showPdfConfirm, setShowPdfConfirm] = useState(false);
   const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
   const [customGenre, setCustomGenre] = useState(isCustomGenre ? (song?.genre ?? "") : "");
   const [dragOver, setDragOver] = useState(false);
@@ -77,7 +79,13 @@ export function AddSongDialog({
       alert("Por favor, selecione um arquivo PDF.");
       return;
     }
-    setPdfFile(file);
+    // Se está editando e já tem PDF, pede confirmação
+    if (isEditing && song?.hasPdf && !pdfFile) {
+      setPendingPdfFile(file);
+      setShowPdfConfirm(true);
+    } else {
+      setPdfFile(file);
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -113,6 +121,34 @@ export function AddSongDialog({
   }
 
   return (
+    {/* Modal de confirmação de troca de PDF */}
+    {showPdfConfirm && (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+        <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-6 shadow-2xl">
+          <h3 className="text-lg font-bold text-foreground mb-2">Trocar arquivo da cifra?</h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            O novo arquivo será usado em <span className="text-foreground font-medium">todos os setlists</span> que contêm esta música. Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => { setPendingPdfFile(null); setShowPdfConfirm(false); }}
+              className="h-11 px-5 rounded-lg border border-border bg-card text-foreground font-medium hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => { setPdfFile(pendingPdfFile); setPendingPdfFile(null); setShowPdfConfirm(false); }}
+              className="h-11 px-5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
+            >
+              Confirmar troca
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"
       onClick={onClose}

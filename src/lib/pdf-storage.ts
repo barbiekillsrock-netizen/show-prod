@@ -59,6 +59,14 @@ export async function getPdfObjectUrl(id: string): Promise<string | null> {
   return url;
 }
 
+export function invalidatePdfCache(id: string): void {
+  const cached = urlCache.get(id);
+  if (cached) {
+    URL.revokeObjectURL(cached);
+    urlCache.delete(id);
+  }
+}
+
 export async function deletePdf(id: string): Promise<void> {
   const cached = urlCache.get(id);
   if (cached) {

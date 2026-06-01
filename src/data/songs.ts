@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { savePdf, deletePdf } from "@/lib/pdf-storage";
+import { savePdf, deletePdf, invalidatePdfCache } from "@/lib/pdf-storage";
 
 export const VALID_KEYS = [
   "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
@@ -163,6 +163,7 @@ export const songsStore = {
     };
     if (pdfFile) {
       try {
+        invalidatePdfCache(id); // invalida cache antes de salvar novo arquivo
         await savePdf(id, pdfFile);
         updated.hasPdf = true;
         updated.pdfName = pdfFile.name;

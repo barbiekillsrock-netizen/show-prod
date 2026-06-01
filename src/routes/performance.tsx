@@ -142,9 +142,11 @@ function PerformancePage() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [pdfMissing, setPdfMissing] = useState(false);
   const activeSongId = activeSong?.id;
+  const activeSongPdfVersion = `${activeSong?.hasPdf}-${activeSong?.pdfName}`; // muda quando PDF é trocado
   useEffect(() => {
     if (!mounted || !activeSong) return;
     let cancelled = false;
+    setPdfUrl(null); // limpa URL antiga antes de carregar nova
     setPdfMissing(false);
     getSongPdfUrl(activeSong)
       .then((url) => {
@@ -159,7 +161,7 @@ function PerformancePage() {
     return () => {
       cancelled = true;
     };
-  }, [mounted, activeSongId]);
+  }, [mounted, activeSongId, activeSongPdfVersion]);
 
   // Compute PDF render size (object-contain)
   const fitSize = useMemo(() => {
