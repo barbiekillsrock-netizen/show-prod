@@ -82,6 +82,7 @@ export function AddSongDialog({
     // Se está editando e já tem PDF cadastrado, pede confirmação
     // Verifica tanto hasPdf quanto pdfName (músicas antigas podem não ter hasPdf)
     const songHasPdf = Boolean(isEditing && (song?.hasPdf || song?.pdfName));
+    console.log("[AddSongDialog] handlePick isEditing:", isEditing, "hasPdf:", song?.hasPdf, "pdfName:", song?.pdfName, "songHasPdf:", songHasPdf);
     if (songHasPdf) {
       setPendingPdfFile(file);
       setShowPdfConfirm(true);
