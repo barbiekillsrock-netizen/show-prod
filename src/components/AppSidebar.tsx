@@ -15,10 +15,10 @@ export function AppSidebar() {
       {/* ── Sidebar lateral — tablet/desktop (md+) ── */}
       <aside className="hidden md:flex w-64 shrink-0 bg-sidebar border-r border-sidebar-border flex-col min-h-screen">
         <div className="px-6 py-8 border-b border-sidebar-border">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Show<span className="text-primary">Prod</span>
+          <h1 className="text-2xl tracking-tight text-foreground">
+            <span className="font-light">Show</span><span className="font-bold">Prod</span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">Cockpit do palco</p>
+          <p className="mt-1 text-xs text-muted-foreground tracking-widest uppercase">Cockpit do palco</p>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">

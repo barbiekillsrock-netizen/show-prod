@@ -266,7 +266,7 @@ export function AddSongDialog({
                       <button
                         type="button"
                         onMouseDown={() => pickSuggestion(k)}
-                        className="w-full text-left px-4 py-2.5 text-base text-[#00E5FF] hover:bg-muted transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-base text-[#F5A623] hover:bg-muted transition-colors"
                       >
                         {k}
                       </button>

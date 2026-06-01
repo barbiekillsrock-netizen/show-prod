@@ -72,7 +72,7 @@ function PerformancePage() {
     if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
-  const [color, setColor] = useState<string>("#00E5FF");
+  const [color, setColor] = useState<string>("#F5A623");
   const [drawings, setDrawings] = useState<DrawingMap>({});
 
   // Container for PDF + canvas overlay
@@ -441,7 +441,7 @@ function PerformancePage() {
           {tool !== null && (
             <button
               type="button"
-              onClick={() => setColor((c) => (c === "#00E5FF" ? "#FF0055" : "#00E5FF"))}
+              onClick={() => setColor((c) => (c === "#F5A623" ? "#FF0055" : "#F5A623"))}
               className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur hover:bg-black/80 relative"
               aria-label="Trocar cor da caneta"
               title="Trocar cor"

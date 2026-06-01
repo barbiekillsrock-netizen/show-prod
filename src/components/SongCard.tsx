@@ -47,7 +47,7 @@ export function SongCard({ song }: { song: Song }) {
             search: { ids: song.id, name: song.title, from: "songs" },
           })
         }
-        className="group relative text-left bg-card rounded-xl border border-border p-6 transition-all hover:border-primary hover:shadow-[0_0_0_1px_var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-primary min-h-[160px] flex flex-col justify-between"
+        className="group relative text-left bg-card rounded-2xl border border-border p-5 transition-all hover:border-foreground/20 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[148px] flex flex-col justify-between"
       >
         {/* Badges: Tom + Estilo */}
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">

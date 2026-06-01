@@ -21,7 +21,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
 
   cover.setFillColor(10, 10, 10);
   cover.rect(0, 0, W, 28, "F");
-  cover.setTextColor(0, 229, 255);
+  cover.setTextColor(245, 166, 35);
   cover.setFontSize(18);
   cover.setFont("helvetica", "bold");
   cover.text("ShowProd", margin, 13);
@@ -46,7 +46,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
   );
   y += 8;
 
-  cover.setDrawColor(0, 229, 255);
+  cover.setDrawColor(245, 166, 35);
   cover.setLineWidth(0.5);
   cover.line(margin, y, W - margin, y);
   y += 8;
@@ -80,7 +80,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
     const artist = song.artist.length > 22 ? song.artist.slice(0, 20) + "…" : song.artist;
     cover.text(artist, margin + 90, y + 1);
     if (song.key) {
-      cover.setFillColor(0, 229, 255);
+      cover.setFillColor(245, 166, 35);
       cover.roundedRect(margin + 143, y - 3, 14, 6, 1, 1, "F");
       cover.setTextColor(10, 10, 10);
       cover.setFont("helvetica", "bold");
@@ -159,7 +159,7 @@ async function shareSetlistPdf(setlist: Setlist, songs: Song[]) {
           y: height - barH * 0.75,
           size: fontSize,
           font,
-          color: rgb(0, 0.898, 1), // #00E5FF
+          color: rgb(0.96, 0.65, 0.14), // #F5A623
         });
       }
 
