@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Pause, Play } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
+import { getDarkModePreference } from "@/lib/preferences";
 import { loadDrawing, loadDrawings, saveDrawing, clearDrawing } from "@/lib/drawings-storage";
 import PdfView, { type PdfViewHandle } from "@/components/PdfView";
 
@@ -49,7 +50,9 @@ function PerformancePage() {
   const activeSong = setlist[activeIdx];
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
-  const [darkMode, setDarkMode] = useState(true); // padrão ligado para palco
+  const [darkMode, setDarkMode] = useState(() =>
+    typeof window !== "undefined" ? getDarkModePreference() : true
+  );
 
   // Cronômetro
   const [elapsed, setElapsed] = useState(0); // segundos

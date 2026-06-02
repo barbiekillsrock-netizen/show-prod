@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Monitor } from "lucide-react";
+import { Monitor, Moon } from "lucide-react";
+import { getDarkModePreference, setDarkModePreference } from "@/lib/preferences";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
 function SettingsPage() {
+  const [darkMode, setDarkMode] = useState(() =>
+    typeof window !== "undefined" ? getDarkModePreference() : true
+  );
   const [wakeLock, setWakeLock] = useState(false);
   const [wakeLockSupported] = useState(
     typeof navigator !== "undefined" && "wakeLock" in navigator
@@ -45,6 +49,37 @@ function SettingsPage() {
       </header>
 
       <div className="space-y-4 max-w-2xl">
+        {/* Modo escuro no show */}
+        <div className="flex items-center justify-between bg-card border border-border rounded-xl p-5 min-h-[64px]">
+          <div className="flex items-center gap-3">
+            <Moon className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <span className="text-base font-medium text-foreground">Modo escuro no show</span>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                PDF com fundo preto ao iniciar o show
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const next = !darkMode;
+              setDarkMode(next);
+              setDarkModePreference(next);
+            }}
+            className={`relative inline-flex h-7 w-12 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+              darkMode ? "bg-primary" : "bg-muted"
+            }`}
+            aria-checked={darkMode}
+            role="switch"
+          >
+            <span
+              className={`pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow-lg transition-transform ${
+                darkMode ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
         {/* Manter tela ligada */}
         <div className="flex items-center justify-between bg-card border border-border rounded-xl p-5 min-h-[64px]">
           <div className="flex items-center gap-3">
