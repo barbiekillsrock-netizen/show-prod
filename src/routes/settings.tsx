@@ -38,7 +38,7 @@ function SettingsPage() {
   return (
     <div className="p-8 lg:p-10">
       <header className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground">Configurações</h2>
+        <h2 className="text-3xl font-light text-foreground">Configurações</h2>
         <p className="mt-1 text-base text-muted-foreground">
           Ajustes do aplicativo e preferências de palco.
         </p>

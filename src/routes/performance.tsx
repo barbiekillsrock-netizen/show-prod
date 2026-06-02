@@ -413,7 +413,7 @@ function PerformancePage() {
             onClick={() => setDarkMode((d) => !d)}
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               darkMode
-                ? "bg-primary text-primary-foreground border-primary"
+                ? "bg-foreground text-background border-foreground"
                 : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
             aria-label={darkMode ? "Desativar modo escuro da cifra" : "Ativar modo escuro da cifra"}
@@ -428,7 +428,7 @@ function PerformancePage() {
             onClick={() => setTool((t) => (t === "pen" ? null : "pen"))}
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "pen"
-                ? "bg-primary text-primary-foreground border-primary"
+                ? "bg-foreground text-background border-foreground"
                 : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
             aria-label="Caneta"
@@ -460,7 +460,7 @@ function PerformancePage() {
             onClick={() => setTool((t) => (t === "eraser" ? null : "eraser"))}
             className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
               tool === "eraser"
-                ? "bg-primary text-primary-foreground border-primary"
+                ? "bg-foreground text-background border-foreground"
                 : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
             aria-label="Borracha"

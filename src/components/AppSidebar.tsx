@@ -55,7 +55,7 @@ export function AppSidebar() {
               }`}
             >
               <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium leading-none">
+              <span className="text-[10px] leading-none">
                 {item.title === "Setlists de Shows" ? "Setlists" : item.title}
               </span>
             </Link>
