@@ -190,7 +190,7 @@ export function AddSongDialog({
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex.: Wish You Were Here"
+              placeholder=""
               className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
@@ -203,7 +203,7 @@ export function AddSongDialog({
             <input
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
-              placeholder="Ex.: Pink Floyd"
+              placeholder=""
               className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
@@ -250,7 +250,7 @@ export function AddSongDialog({
                 onChange={(e) => handleKeyChange(e.target.value)}
                 onBlur={handleKeyBlur}
                 onFocus={() => setKeyTouched(false)}
-                placeholder="Ex.: G, Am, F#"
+                placeholder=""
                 maxLength={4}
                 className={`w-full h-12 px-4 rounded-lg bg-background border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
                   keyError
@@ -294,7 +294,7 @@ export function AddSongDialog({
               max="300"
               value={bpm}
               onChange={(e) => setBpm(e.target.value)}
-              placeholder="Ex.: 120"
+              placeholder=""
               className="w-full h-12 px-4 rounded-lg bg-background border border-border text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
