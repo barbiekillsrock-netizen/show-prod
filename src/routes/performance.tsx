@@ -579,8 +579,16 @@ function PerformancePage() {
         </div>
       )}
 
-      {/* End-of-show hint when on last */}
-      {activeIdx === setlist.length - 1 && (
+      {/* Próxima música ou fim do show */}
+      {activeIdx < setlist.length - 1 ? (
+        <div className="absolute bottom-4 right-4 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 max-w-[220px]">
+          <span className="text-white/25 mr-1">A seguir:</span>
+          <span className="text-white/60 font-medium truncate">
+            {setlist[activeIdx + 1].title}
+          </span>
+          <span className="text-white/30 ml-1">— {setlist[activeIdx + 1].artist}</span>
+        </div>
+      ) : (
         <div className="absolute bottom-4 right-4 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 flex items-center gap-2">
           <X className="h-3 w-3" />
           Última música do show
