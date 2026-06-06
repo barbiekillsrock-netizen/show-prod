@@ -579,21 +579,20 @@ function PerformancePage() {
         </div>
       )}
 
-      {/* Próxima música ou fim do show */}
+    </div>
+
+      {/* Próxima música ou fim do show — fora do stage para não ser cortado pelo overflow-hidden */}
       {activeIdx < setlist.length - 1 ? (
-        <div className="absolute bottom-4 right-4 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 max-w-[220px]">
-          <span className="text-white/25 mr-1">A seguir:</span>
-          <span className="text-white/60 font-medium truncate">
-            {setlist[activeIdx + 1].title}
-          </span>
+        <div className="absolute bottom-6 right-6 z-40 text-xs bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 max-w-[240px] pointer-events-none">
+          <span className="text-white/30 mr-1">A seguir:</span>
+          <span className="text-white/70 font-medium">{setlist[activeIdx + 1].title}</span>
           <span className="text-white/30 ml-1">— {setlist[activeIdx + 1].artist}</span>
         </div>
       ) : (
-        <div className="absolute bottom-4 right-4 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 flex items-center gap-2">
+        <div className="absolute bottom-6 right-6 z-40 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 flex items-center gap-2 pointer-events-none">
           <X className="h-3 w-3" />
           Última música do show
         </div>
       )}
-    </div>
   );
 }
