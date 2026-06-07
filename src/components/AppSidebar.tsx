@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Music, ListMusic, Settings } from "lucide-react";
+import { Music, ListMusic, Settings, PenLine } from "lucide-react";
 
 const items = [
   { title: "Músicas", url: "/", icon: Music },
   { title: "Setlists de Shows", url: "/setlists", icon: ListMusic },
+  { title: "Editor", url: "/editor", icon: PenLine },
   { title: "Configurações", url: "/settings", icon: Settings },
 ];
 
