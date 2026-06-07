@@ -335,6 +335,7 @@ export function AddSongDialog({
             </div>
 
             {inputMode === "text" ? (
+              <>
               <div className="relative">
                 <textarea
                   value={lyrics}
@@ -353,6 +354,7 @@ export function AddSongDialog({
               <p className="text-xs text-muted-foreground mt-1.5">
                 Suporta letras, cifras (ex: [G], [Am]), anotações e observações de arranjo.
               </p>
+              </>
             ) : (
             <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
