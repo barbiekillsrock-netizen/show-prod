@@ -150,8 +150,14 @@ function PerformancePage() {
   const hasLyrics = Boolean(activeSong?.lyrics && !activeSong?.hasPdf);
   useEffect(() => {
     if (!mounted || !activeSong) return;
+    // Músicas com lyrics não precisam de PDF
+    if (activeSong.lyrics && !activeSong.hasPdf) {
+      setPdfUrl(null);
+      setPdfMissing(false);
+      return;
+    }
     let cancelled = false;
-    setPdfUrl(null); // limpa URL antiga antes de carregar nova
+    setPdfUrl(null);
     setPdfMissing(false);
     getSongPdfUrl(activeSong)
       .then((url) => {
