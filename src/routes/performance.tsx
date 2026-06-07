@@ -612,9 +612,8 @@ function PerformancePage() {
         </div>
       )}
 
-    </div>
 
-      {/* Próxima música ou fim do show — fora do stage para não ser cortado pelo overflow-hidden */}
+      {/* Próxima música ou fim do show */}
       {activeIdx < setlist.length - 1 ? (
         <div className="absolute bottom-6 right-6 z-40 text-xs bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10 max-w-[240px] pointer-events-none">
           <span className="text-white/30 mr-1">A seguir:</span>
@@ -627,5 +626,6 @@ function PerformancePage() {
           Última música do show
         </div>
       )}
+    </div>
   );
 }
