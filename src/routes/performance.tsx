@@ -39,12 +39,6 @@ function PerformancePage() {
   }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
-  const [isTouchDevice] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(hover: none) and (pointer: coarse)").matches
-      || window.matchMedia("(pointer: coarse)").matches
-      || navigator.maxTouchPoints > 0;
-  });
   const [showHint, setShowHint] = useState(true);
   useEffect(() => {
     setMounted(true);
@@ -631,24 +625,29 @@ function PerformancePage() {
 
       {/* Desktop-only navigation arrows. Hidden on touch devices via CSS
           (.stage-arrow rule in styles.css) — touch users swipe horizontally. */}
-      <button
-        type="button"
-        aria-label="Página/música anterior"
-        onClick={goPrev}
-        disabled={activeIdx === 0 && pageInfo.current === 0}
-        className={`stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition ${isTouchDevice ? "hidden" : "inline-flex"}`}
-      >
-        <ChevronLeft className="h-7 w-7" />
-      </button>
-      <button
-        type="button"
-        aria-label="Próxima página/música"
-        onClick={goNext}
-        disabled={activeIdx >= setlist.length - 1 && pageInfo.current >= pageInfo.total - 1}
-        className={`stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition ${isTouchDevice ? "hidden" : "inline-flex"}`}
-      >
-        <ChevronRight className="h-7 w-7" />
-      </button>
+      {/* Setas só aparecem após hydration e só em dispositivos sem touch */}
+      {mounted && typeof navigator !== "undefined" && navigator.maxTouchPoints === 0 && (
+        <>
+          <button
+            type="button"
+            aria-label="Página/música anterior"
+            onClick={goPrev}
+            disabled={activeIdx === 0 && pageInfo.current === 0}
+            className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
+          >
+            <ChevronLeft className="h-7 w-7" />
+          </button>
+          <button
+            type="button"
+            aria-label="Próxima página/música"
+            onClick={goNext}
+            disabled={activeIdx >= setlist.length - 1 && pageInfo.current >= pageInfo.total - 1}
+            className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
+          >
+            <ChevronRight className="h-7 w-7" />
+          </button>
+        </>
+      )}
 
 
       {/* Usage hint (auto-hides) */}
