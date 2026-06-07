@@ -206,7 +206,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
   return (
     <div
       ref={containerRef}
-      aria-label="PDF da cifra"
+      aria-label="PDF da música"
       className="absolute inset-0 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory pdf-scroll-x"
       style={{ scrollbarWidth: "none", touchAction: "pan-x", scrollBehavior: "auto" }}
     />

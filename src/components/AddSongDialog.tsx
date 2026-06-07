@@ -132,7 +132,7 @@ export function AddSongDialog({
     {showPdfConfirm && (
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
         <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-6 shadow-2xl">
-          <h3 className="text-lg font-bold text-foreground mb-2">Trocar arquivo da cifra?</h3>
+          <h3 className="text-lg font-bold text-foreground mb-2">Trocar arquivo da música?</h3>
           <p className="text-sm text-muted-foreground mb-6">
             O novo arquivo será usado em <span className="text-foreground font-medium">todos os setlists</span> que contêm esta música. Esta ação não pode ser desfeita.
           </p>
@@ -167,7 +167,7 @@ export function AddSongDialog({
         <div className="flex items-start justify-between mb-5">
           <div>
             <h3 className="text-2xl font-bold text-foreground">
-              {isEditing ? "Editar Cifra" : "Adicionar Nova Cifra"}
+              {isEditing ? "Editar Música" : "Adicionar Nova Música"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {isEditing ? "Atualize os dados da música." : "Cadastre uma música no seu repertório."}
@@ -304,39 +304,55 @@ export function AddSongDialog({
 
           {/* Abas PDF / Texto */}
           <div>
-            <div className="flex items-center gap-1 mb-3 bg-secondary rounded-lg p-1">
+            {/* Seletor de modo — destaque visual */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <button
                 type="button"
                 onClick={() => setInputMode("pdf")}
-                className={`flex-1 h-8 rounded-md text-sm font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
                   inputMode === "pdf"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground"
                 }`}
               >
-                📄 PDF
+                <span className="text-2xl">📄</span>
+                <span className="text-sm font-semibold">Upload PDF</span>
+                <span className="text-xs opacity-60 text-center">Envie o arquivo da partitura ou cifra</span>
               </button>
               <button
                 type="button"
                 onClick={() => setInputMode("text")}
-                className={`flex-1 h-8 rounded-md text-sm font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
                   inputMode === "text"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground"
                 }`}
               >
-                ✏️ Digitar música
+                <span className="text-2xl">✏️</span>
+                <span className="text-sm font-semibold">Digitar música</span>
+                <span className="text-xs opacity-60 text-center">Digite letra, cifra ou anotações</span>
               </button>
             </div>
 
             {inputMode === "text" ? (
-              <textarea
-                value={lyrics}
-                onChange={(e) => setLyrics(e.target.value)}
-                placeholder={'[G]  [D]\nWish you were here\n[Em] [C]\nWe\'re just two lost souls...'}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-none"
-                style={{ minHeight: "320px" }}
-              />
+              <div className="relative">
+                <textarea
+                  value={lyrics}
+                  onChange={(e) => setLyrics(e.target.value)}
+                  placeholder={'[G]  [D]\nWish you were here\n[Em] [C]\nWe\'re just two lost souls...'}
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-none leading-7"
+                  style={{ minHeight: "380px" }}
+                  autoFocus={inputMode === "text"}
+                />
+                {lyrics.length > 0 && (
+                  <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-md border border-border">
+                    {lyrics.split("\n").length} linhas
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Suporta letras, cifras (ex: [G], [Am]), anotações e observações de arranjo.
+              </p>
             ) : (
             <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
@@ -396,7 +412,7 @@ export function AddSongDialog({
                   Clique para selecionar ou arraste o PDF
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  Sem PDF, usamos uma cifra de demonstração
+                  Sem PDF, usamos uma música de demonstração
                 </span>
               </button>
             )}

@@ -439,7 +439,7 @@ function PerformancePage() {
                 ? "bg-foreground text-background border-foreground"
                 : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`}
-            aria-label={darkMode ? "Desativar modo escuro da cifra" : "Ativar modo escuro da cifra"}
+            aria-label={darkMode ? "Desativar modo escuro" : "Ativar modo escuro"}
             title={darkMode ? "Modo escuro ON" : "Modo escuro OFF"}
           >
             {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
@@ -574,7 +574,7 @@ function PerformancePage() {
                 Arquivo PDF não encontrado
               </p>
               <p className="text-sm text-white/50">
-                O upload desta cifra não está mais disponível no armazenamento
+                O arquivo desta música não está mais disponível
                 do navegador. Isso pode acontecer se os dados do site forem
                 limpos. Reenvie o PDF em "Músicas" para restaurá-lo.
               </p>
@@ -608,7 +608,7 @@ function PerformancePage() {
       {/* Usage hint (auto-hides) */}
       {showHint && setlist.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 text-xs text-white/40 bg-black/60 backdrop-blur px-3 py-1.5 rounded-md border border-white/10">
-          Use as setas ← → do teclado, os botões laterais ou deslize para trocar de cifra
+          Use as setas ← → do teclado, os botões laterais ou deslize para trocar de música
         </div>
       )}
 

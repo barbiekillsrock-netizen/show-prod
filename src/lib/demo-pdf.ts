@@ -69,7 +69,7 @@ export function buildDemoPdfUrl(song: Song): string {
   doc.setFontSize(9);
   doc.setTextColor(150);
   doc.text(
-    "Cifra de demonstração • ShowProd",
+    "Música de demonstração • ShowProd",
     pageW / 2,
     doc.internal.pageSize.getHeight() - 20,
     { align: "center" },
@@ -120,7 +120,7 @@ export function buildDemoPdfBytes(song: Song): ArrayBuffer {
   doc.setFontSize(9);
   doc.setTextColor(150);
   doc.text(
-    "Cifra de demonstração • ShowProd",
+    "Música de demonstração • ShowProd",
     pageW / 2,
     doc.internal.pageSize.getHeight() - 20,
     { align: "center" },

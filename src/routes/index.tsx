@@ -101,7 +101,7 @@ function SongsPage() {
             className="inline-flex items-center justify-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity min-h-[48px]"
           >
             <Plus className="h-5 w-5" strokeWidth={3} />
-            Adicionar Nova Cifra
+            Adicionar Nova Música
           </button>
         </div>
       </div>
