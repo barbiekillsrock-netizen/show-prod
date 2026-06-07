@@ -50,6 +50,7 @@ function PerformancePage() {
   const activeSong = setlist[activeIdx];
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
+  const [lyricsFontSize, setLyricsFontSize] = useState(18);
   const [darkMode, setDarkMode] = useState(() =>
     typeof window !== "undefined" ? getDarkModePreference() : true
   );
@@ -145,7 +146,8 @@ function PerformancePage() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [pdfMissing, setPdfMissing] = useState(false);
   const activeSongId = activeSong?.id;
-  const activeSongPdfVersion = `${activeSong?.hasPdf}-${activeSong?.pdfName}`; // muda quando PDF é trocado
+  const activeSongPdfVersion = `${activeSong?.hasPdf}-${activeSong?.pdfName}`;
+  const hasLyrics = Boolean(activeSong?.lyrics && !activeSong?.hasPdf);
   useEffect(() => {
     if (!mounted || !activeSong) return;
     let cancelled = false;
@@ -410,6 +412,24 @@ function PerformancePage() {
 
         {/* Linha 2: Ferramentas — scroll horizontal no mobile */}
         <div className="flex items-center gap-2 px-3 pb-2 overflow-x-auto scrollbar-none pointer-events-auto">
+          {/* Zoom de fonte — só no modo lyrics */}
+          {hasLyrics && (
+            <>
+              <button
+                type="button"
+                onClick={() => setLyricsFontSize(s => Math.max(12, s - 2))}
+                className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 text-lg font-bold shrink-0"
+                title="Diminuir fonte"
+              >A-</button>
+              <button
+                type="button"
+                onClick={() => setLyricsFontSize(s => Math.min(40, s + 2))}
+                className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 text-lg font-bold shrink-0"
+                title="Aumentar fonte"
+              >A+</button>
+            </>
+          )}
+
           {/* Dark Mode toggle */}
           <button
             type="button"
@@ -493,7 +513,20 @@ function PerformancePage() {
         ref={stageRef}
         className="absolute inset-0 bg-black overflow-hidden"
       >
-        {pdfUrl && stageSize.width > 0 && stageSize.height > 0 && (
+        {hasLyrics && activeSong?.lyrics ? (
+          <div
+            className={`absolute inset-0 overflow-y-auto overflow-x-hidden px-8 py-6 ${
+              darkMode ? "bg-black text-white" : "bg-white text-black"
+            }`}
+          >
+            <pre
+              className="font-mono text-base leading-7 whitespace-pre-wrap break-words"
+              style={{ fontSize: `${lyricsFontSize}px` }}
+            >
+              {activeSong.lyrics}
+            </pre>
+          </div>
+        ) : pdfUrl && stageSize.width > 0 && stageSize.height > 0 ? (
           <PdfView
             ref={pdfRef}
             file={pdfUrl}
@@ -503,7 +536,7 @@ function PerformancePage() {
             onLoadSuccess={handlePdfLoadSuccess}
             onPagesChange={handlePagesChange}
           />
-        )}
+        ) : null}
 
         {/* Drawing overlay — centered over the first page only.
             Stays in viewport (not inside the scroll strip) so the user always

@@ -21,6 +21,8 @@ export function AddSongDialog({
   const isCustomGenre = Boolean(song?.genre && !GENRES.includes(song.genre));
   const [genre, setGenre] = useState(isCustomGenre ? "Outro" : (song?.genre ?? ""));
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [lyrics, setLyrics] = useState(song?.lyrics ?? "");
+  const [inputMode, setInputMode] = useState<"pdf" | "text">(song?.lyrics ? "text" : "pdf");
   const [pendingPdfFile, setPendingPdfFile] = useState<File | null>(null);
   const [showPdfConfirm, setShowPdfConfirm] = useState(false);
   const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
@@ -103,6 +105,7 @@ export function AddSongDialog({
           key: songKey.trim() ? normalizeKey(songKey) : "",
           genre: genre === "Outro" ? (customGenre.trim() || "Outro") : (genre || undefined),
         bpm: bpm.trim() ? Number(bpm) : undefined,
+        lyrics: inputMode === "text" ? lyrics.trim() || undefined : undefined,
         },
         pdfFile,
       );
@@ -299,10 +302,48 @@ export function AddSongDialog({
             />
           </div>
 
-          {/* PDF */}
+          {/* Abas PDF / Texto */}
           <div>
+            <div className="flex items-center gap-1 mb-3 bg-secondary rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setInputMode("pdf")}
+                className={`flex-1 h-8 rounded-md text-sm font-medium transition-colors ${
+                  inputMode === "pdf"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                📄 Upload PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode("text")}
+                className={`flex-1 h-8 rounded-md text-sm font-medium transition-colors ${
+                  inputMode === "text"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                ✏️ Digitar cifra
+              </button>
+            </div>
+
+            {inputMode === "text" ? (
+              <textarea
+                value={lyrics}
+                onChange={(e) => setLyrics(e.target.value)}
+                placeholder={"[G]          [D]
+Wish you were here
+[Em]         [C]
+We're just two lost souls..."}
+                rows={8}
+                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-y"
+              />
+            ) : (
+            <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Arquivo PDF da cifra{" "}
+              Arquivo PDF{" "}
               <span className="text-muted-foreground font-normal">(opcional)</span>
             </label>
 
@@ -361,6 +402,8 @@ export function AddSongDialog({
                   Sem PDF, usamos uma cifra de demonstração
                 </span>
               </button>
+            )}
+            </div>
             )}
           </div>
 

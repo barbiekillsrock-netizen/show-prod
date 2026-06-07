@@ -35,6 +35,7 @@ export type Song = {
   key: string;
   genre?: string;
   bpm?: number;
+  lyrics?: string;  // cifra/letra em texto livre
   hasPdf?: boolean;
   pdfName?: string;
 };
@@ -124,6 +125,7 @@ export const songsStore = {
       key: normalizeKey(song.key),
       genre: song.genre,
       bpm: song.bpm,
+      lyrics: song.lyrics,
       pdfName: pdfFile?.name,
       hasPdf: false,
     };
