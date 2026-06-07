@@ -61,9 +61,9 @@ function PerformancePage() {
   const autoScrollRef = useRef<number | null>(null);
   const scrollAccumRef = useRef<number>(0); // acumula frações de pixel
 
-  // Inicia/para a rolagem automática
+  // Inicia/para a rolagem automática — só no cliente
   useEffect(() => {
-    if (!autoScroll || !hasLyrics) {
+    if (!mounted || !autoScroll || !hasLyrics) {
       if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
       return;
     }
@@ -94,7 +94,7 @@ function PerformancePage() {
     return () => {
       if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
     };
-  }, [autoScroll, scrollSpeed, hasLyrics]);
+  }, [mounted, autoScroll, scrollSpeed, hasLyrics]);
 
   // Para rolagem ao trocar de música
   useEffect(() => {
