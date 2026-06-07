@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Pen, Eraser, Trash2, Palette, Moon, Sun, Pause, Play, ChevronsUp, ChevronsDown } from "lucide-react";
 import { useSongs, type Song } from "@/data/songs";
 import { getSongPdfUrl } from "@/lib/song-pdf";
 import { getDarkModePreference } from "@/lib/preferences";
@@ -53,6 +53,55 @@ function PerformancePage() {
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
   const [lyricsFontSize, setLyricsFontSize] = useState(18);
+
+  // Rolagem automática
+  const [autoScroll, setAutoScroll] = useState(false);
+  const [scrollSpeed, setScrollSpeed] = useState(3); // 1-10
+  const lyricsContainerRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollRef = useRef<number | null>(null);
+  const scrollAccumRef = useRef<number>(0); // acumula frações de pixel
+
+  // Inicia/para a rolagem automática
+  useEffect(() => {
+    if (!autoScroll || !hasLyrics) {
+      if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
+      return;
+    }
+    const pxPerSecond = scrollSpeed * 18; // ~18px/s por unidade de velocidade
+    let lastTime: number | null = null;
+
+    function step(now: number) {
+      if (!autoScroll) return;
+      if (lastTime !== null) {
+        const delta = (now - lastTime) / 1000; // segundos
+        scrollAccumRef.current += pxPerSecond * delta;
+        const px = Math.floor(scrollAccumRef.current);
+        if (px > 0 && lyricsContainerRef.current) {
+          lyricsContainerRef.current.scrollTop += px;
+          scrollAccumRef.current -= px;
+          // Para automaticamente ao chegar no fim
+          const el = lyricsContainerRef.current;
+          if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) {
+            setAutoScroll(false);
+            return;
+          }
+        }
+      }
+      lastTime = now;
+      autoScrollRef.current = requestAnimationFrame(step);
+    }
+    autoScrollRef.current = requestAnimationFrame(step);
+    return () => {
+      if (autoScrollRef.current) cancelAnimationFrame(autoScrollRef.current);
+    };
+  }, [autoScroll, scrollSpeed, hasLyrics]);
+
+  // Para rolagem ao trocar de música
+  useEffect(() => {
+    setAutoScroll(false);
+    scrollAccumRef.current = 0;
+  }, [activeSongId]);
+
   const [darkMode, setDarkMode] = useState(() =>
     typeof window !== "undefined" ? getDarkModePreference() : true
   );
@@ -450,6 +499,45 @@ function PerformancePage() {
 
         {/* Linha 2: Ferramentas — scroll horizontal no mobile */}
         <div className="flex items-center gap-2 px-3 pb-2 overflow-x-auto scrollbar-none pointer-events-auto">
+          {/* Controles de rolagem automática — só no modo lyrics */}
+          {hasLyrics && (
+            <>
+              {/* Play/Pause rolagem */}
+              <button
+                type="button"
+                onClick={() => setAutoScroll(a => !a)}
+                className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-lg border backdrop-blur transition-colors shrink-0 ${
+                  autoScroll
+                    ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623] font-semibold"
+                    : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
+                }`}
+                title={autoScroll ? "Pausar rolagem" : "Iniciar rolagem automática"}
+              >
+                {autoScroll ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                <span className="text-xs">{autoScroll ? "Parar" : "Auto"}</span>
+              </button>
+              {/* Velocidade - */}
+              <button
+                type="button"
+                onClick={() => setScrollSpeed(s => Math.max(1, s - 1))}
+                className="inline-flex items-center justify-center h-11 w-9 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 shrink-0"
+                title="Mais lento"
+              >
+                <ChevronsDown className="h-4 w-4" />
+              </button>
+              <span className="text-xs text-white/50 w-4 text-center shrink-0">{scrollSpeed}</span>
+              {/* Velocidade + */}
+              <button
+                type="button"
+                onClick={() => setScrollSpeed(s => Math.min(10, s + 1))}
+                className="inline-flex items-center justify-center h-11 w-9 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 shrink-0"
+                title="Mais rápido"
+              >
+                <ChevronsUp className="h-4 w-4" />
+              </button>
+            </>
+          )}
+
           {/* Zoom de fonte — só no modo lyrics */}
           {hasLyrics && (
             <>
@@ -555,6 +643,8 @@ function PerformancePage() {
       >
         {hasLyrics && activeSong?.lyrics ? (
           <div
+            ref={lyricsContainerRef}
+            onClick={() => setAutoScroll(a => !a)}
             className={`absolute inset-0 overflow-y-auto overflow-x-hidden px-8 py-6 ${
               darkMode ? "bg-black text-white" : "bg-white text-black"
             }`}
@@ -565,6 +655,8 @@ function PerformancePage() {
             >
               {activeSong.lyrics}
             </pre>
+            {/* Espaço extra no fim para o texto sair completamente da tela */}
+            <div style={{ height: "80vh" }} />
           </div>
         ) : pdfUrl && stageSize.width > 0 && stageSize.height > 0 ? (
           <PdfView
