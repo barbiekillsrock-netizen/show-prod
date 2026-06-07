@@ -628,7 +628,7 @@ function PerformancePage() {
         aria-label="Página/música anterior"
         onClick={goPrev}
         disabled={activeIdx === 0 && pageInfo.current === 0}
-        className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
+        className="stage-arrow absolute left-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition hidden [@media(hover:hover)]:inline-flex"
       >
         <ChevronLeft className="h-7 w-7" />
       </button>
@@ -637,7 +637,7 @@ function PerformancePage() {
         aria-label="Próxima página/música"
         onClick={goNext}
         disabled={activeIdx >= setlist.length - 1 && pageInfo.current >= pageInfo.total - 1}
-        className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition"
+        className="stage-arrow absolute right-3 top-1/2 -translate-y-1/2 z-30 items-center justify-center h-14 w-14 rounded-full bg-black/50 backdrop-blur border border-white/10 text-white/70 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-not-allowed transition hidden [@media(hover:hover)]:inline-flex"
       >
         <ChevronRight className="h-7 w-7" />
       </button>
