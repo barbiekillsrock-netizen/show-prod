@@ -64,7 +64,7 @@ function SongsPage() {
   }, [songs]);
 
   return (
-    <div className="p-8 lg:p-10">
+    <div className="p-4 md:p-8 lg:p-10">
       <header className="mb-8">
         <h2 className="text-3xl font-light text-foreground">Músicas</h2>
         <p className="mt-1 text-base text-muted-foreground">
@@ -72,7 +72,7 @@ function SongsPage() {
         </p>
       </header>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
+      <div className="flex flex-col md:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <input
@@ -98,7 +98,7 @@ function SongsPage() {
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="inline-flex items-center justify-center gap-2 h-14 px-6 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity min-h-[48px]"
+            className="inline-flex items-center justify-center gap-2 h-11 md:h-14 px-4 md:px-6 rounded-lg bg-foreground text-background font-semibold text-sm md:text-base hover:opacity-80 transition-opacity shrink-0"
           >
             <Plus className="h-5 w-5" strokeWidth={3} />
             Adicionar Nova Música
@@ -108,7 +108,7 @@ function SongsPage() {
 
       {/* Filtro por estilo */}
       {activeGenres.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6 -mt-2">
+        <div className="flex flex-wrap gap-2 mb-4 -mt-1">
           {activeGenres.map((g) => (
             <button
               key={g}
@@ -140,7 +140,7 @@ function SongsPage() {
           Nenhuma música encontrada.
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {filtered.map((song) => (
             <SongCard key={song.id} song={song} />
           ))}

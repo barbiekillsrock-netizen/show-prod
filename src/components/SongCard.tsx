@@ -47,12 +47,12 @@ export function SongCard({ song }: { song: Song }) {
             search: { ids: song.id, name: song.title, from: "songs" },
           })
         }
-        className="group relative text-left bg-card rounded-2xl border border-border p-5 transition-all hover:border-foreground/20 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[148px] flex flex-col justify-between"
+        className="group relative text-left bg-card rounded-xl border border-border p-4 transition-all hover:border-foreground/20 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring flex flex-col justify-between"
       >
         {/* Badges: Tom + Estilo */}
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
           {song.key && (
-            <span className="inline-flex items-center justify-center min-w-[48px] h-8 px-3 rounded-md bg-primary text-primary-foreground font-bold text-base tracking-wide">
+            <span className="inline-flex items-center justify-center min-w-[36px] h-6 px-2 rounded-md bg-foreground text-background font-bold text-xs tracking-wide">
               {song.key}
             </span>
           )}
@@ -70,10 +70,10 @@ export function SongCard({ song }: { song: Song }) {
 
         {/* Título e artista */}
         <div className="pr-16">
-          <h3 className="text-xl font-semibold text-foreground leading-tight line-clamp-2">
+          <h3 className="text-base font-semibold text-foreground leading-tight line-clamp-2">
             {song.title}
           </h3>
-          <p className="mt-2 text-base text-muted-foreground">{song.artist}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{song.artist}</p>
         </div>
 
         {/* Botões editar e deletar — aparecem no hover */}
