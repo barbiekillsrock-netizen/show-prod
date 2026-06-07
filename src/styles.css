@@ -103,3 +103,7 @@
 
 /* Stage navigation arrows */
 .stage-arrow { display: inline-flex; }
+@media (hover: none) and (pointer: coarse) {
+  /* Touch devices (mobile/tablet) — hide arrows, use swipe */
+  .stage-arrow { display: none !important; }
+}

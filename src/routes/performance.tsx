@@ -213,6 +213,36 @@ function PerformancePage() {
     redraw();
   }, [redraw]);
 
+  // Swipe gesture para troca de música (touch devices)
+  const swipeStartX = useRef<number | null>(null);
+  const swipeStartY = useRef<number | null>(null);
+
+  function onTouchStart(e: React.TouchEvent) {
+    if (tool !== null) return; // não interfere no modo desenho
+    swipeStartX.current = e.touches[0].clientX;
+    swipeStartY.current = e.touches[0].clientY;
+  }
+
+  function onTouchEnd(e: React.TouchEvent) {
+    if (tool !== null || swipeStartX.current === null || swipeStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - swipeStartX.current;
+    const dy = e.changedTouches[0].clientY - swipeStartY.current;
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+    // Só detecta swipe horizontal maior que 60px e mais horizontal que vertical
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const info = pdfRef.current?.getPageInfo();
+    if (dx < 0) {
+      // Swipe esquerda → próxima
+      if (info && info.current < info.total - 1) return; // deixa PdfView tratar
+      goNext();
+    } else {
+      // Swipe direita → anterior
+      if (info && info.current > 0) return; // deixa PdfView tratar
+      goPrev();
+    }
+  }
+
   // Navigation: prev/next moves through pages first, then between songs.
   const goPrev = useCallback(() => {
     const info = pdfRef.current?.getPageInfo();
@@ -512,6 +542,8 @@ function PerformancePage() {
       <div
         ref={stageRef}
         className="absolute inset-0 bg-black overflow-hidden"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         {hasLyrics && activeSong?.lyrics ? (
           <div
