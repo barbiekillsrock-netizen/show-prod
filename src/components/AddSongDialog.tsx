@@ -333,10 +333,7 @@ export function AddSongDialog({
               <textarea
                 value={lyrics}
                 onChange={(e) => setLyrics(e.target.value)}
-                placeholder={"[G]          [D]
-Wish you were here
-[Em]         [C]
-We're just two lost souls..."}
+                placeholder={'[G]  [D]\nWish you were here\n[Em] [C]\nWe\'re just two lost souls...'}
                 rows={8}
                 className="w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-y"
               />
