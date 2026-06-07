@@ -39,11 +39,15 @@ function PerformancePage() {
   }, [ids, allSongs]);
 
   const [mounted, setMounted] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isTouchDevice] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(hover: none) and (pointer: coarse)").matches
+      || window.matchMedia("(pointer: coarse)").matches
+      || navigator.maxTouchPoints > 0;
+  });
   const [showHint, setShowHint] = useState(true);
   useEffect(() => {
     setMounted(true);
-    setIsTouchDevice(window.matchMedia("(hover: none) and (pointer: coarse)").matches);
   }, []);
   useEffect(() => {
     const t = setTimeout(() => setShowHint(false), 4000);
