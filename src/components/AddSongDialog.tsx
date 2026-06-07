@@ -157,11 +157,11 @@ export function AddSongDialog({
     )}
 
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-card border border-border rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className={`w-full bg-card border border-border rounded-2xl p-6 shadow-2xl overflow-y-auto ${inputMode === "text" ? "max-w-2xl max-h-[96vh]" : "max-w-lg max-h-[90vh]"}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-5">
@@ -314,7 +314,7 @@ export function AddSongDialog({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                📄 Upload PDF
+                📄 PDF
               </button>
               <button
                 type="button"
@@ -325,7 +325,7 @@ export function AddSongDialog({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                ✏️ Digitar cifra
+                ✏️ Digitar música
               </button>
             </div>
 
@@ -334,8 +334,8 @@ export function AddSongDialog({
                 value={lyrics}
                 onChange={(e) => setLyrics(e.target.value)}
                 placeholder={'[G]  [D]\nWish you were here\n[Em] [C]\nWe\'re just two lost souls...'}
-                rows={8}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-y"
+                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-none"
+                style={{ minHeight: "320px" }}
               />
             ) : (
             <div>
