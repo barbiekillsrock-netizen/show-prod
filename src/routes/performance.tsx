@@ -50,6 +50,7 @@ function PerformancePage() {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const activeSong = setlist[activeIdx];
+  const hasLyrics = Boolean(activeSong?.lyrics && !activeSong?.hasPdf);
 
   const [tool, setTool] = useState<"pen" | "eraser" | null>(null);
   const [lyricsFontSize, setLyricsFontSize] = useState(18);
