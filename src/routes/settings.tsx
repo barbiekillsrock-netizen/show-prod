@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Monitor, Moon } from "lucide-react";
+import { Monitor, Moon, Info, Mail, Heart } from "lucide-react";
 import { getDarkModePreference, setDarkModePreference } from "@/lib/preferences";
 
 export const Route = createFileRoute("/settings")({
@@ -118,6 +118,53 @@ function SettingsPage() {
             <p className="text-xs text-muted-foreground mt-0.5">Em breve</p>
           </div>
           <span className="text-xs text-muted-foreground border border-border rounded-full px-2 py-1">Em breve</span>
+        </div>
+
+        {/* Sobre */}
+        <div className="mt-8 pt-8 border-t border-border">
+          <div className="flex items-center gap-2 mb-6">
+            <Info className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Sobre</span>
+          </div>
+
+          <div className="flex flex-col items-center text-center gap-4 py-4">
+            {/* Logo */}
+            <div className="mb-2">
+              <h2 className="text-3xl tracking-tight text-foreground">
+                <span className="font-light">Show</span><span className="font-black">Prod</span>
+              </h2>
+              <p className="text-xs text-muted-foreground tracking-widest uppercase mt-1">Stage Manager</p>
+            </div>
+
+            {/* Descrição */}
+            <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+              Desenvolvido pela{" "}
+              <span className="text-foreground font-medium">ATOM Product Lab</span>{" "}
+              para atender as necessidades reais de palco da banda{" "}
+              <span className="text-foreground font-medium">Barbie Kills</span>.
+            </p>
+
+            {/* Feito com amor */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span>Feito com</span>
+              <Heart className="h-3 w-3 fill-current text-red-400" />
+              <span>em Campinas, Brasil</span>
+            </div>
+
+            {/* Contato */}
+            <a
+              href="mailto:atomproductlab@gmail.com"
+              className="inline-flex items-center gap-2 mt-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Mail className="h-4 w-4" />
+              atomproductlab@gmail.com
+            </a>
+
+            {/* Versão */}
+            <p className="text-xs text-muted-foreground/50 mt-4">
+              Versão 1.0.0 · © 2026 ATOM Product Lab
+            </p>
+          </div>
         </div>
       </div>
     </div>
