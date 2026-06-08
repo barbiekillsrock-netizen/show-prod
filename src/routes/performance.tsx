@@ -198,7 +198,6 @@ function PerformancePage() {
   const [pdfMissing, setPdfMissing] = useState(false);
   const activeSongId = activeSong?.id;
   const activeSongPdfVersion = `${activeSong?.hasPdf}-${activeSong?.pdfName}`;
-  const hasLyrics = Boolean(activeSong?.lyrics && !activeSong?.hasPdf);
   useEffect(() => {
     if (!mounted || !activeSong) return;
     // Músicas com lyrics não precisam de PDF
