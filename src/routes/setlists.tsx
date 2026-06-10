@@ -78,7 +78,7 @@ function SetlistsIndex() {
   }
 
   return (
-    <div className="p-4 md:p-8 lg:p-10 h-screen flex flex-col">
+    <div className="p-3 md:p-4 lg:p-6 h-screen flex flex-col">
       <header className="mb-8 shrink-0 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-foreground">Setlists de Shows</h2>
@@ -225,7 +225,7 @@ function SetlistItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-lg border-2 bg-card transition-colors ${
+      className={`group flex items-center gap-2 min-h-[48px] px-3 py-2 rounded-lg border-2 bg-card transition-colors ${
         isDragging ? "opacity-40 border-primary" : "border-border hover:border-primary/60"
       }`}
     >
@@ -426,7 +426,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
   }
 
   return (
-    <div className="p-4 md:p-8 lg:p-10 h-screen flex flex-col">
+    <div className="p-3 md:p-4 lg:p-6 h-screen flex flex-col">
       <header className="mb-6 shrink-0 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <button
@@ -534,8 +534,8 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
           </button>
         </div>
 
-        <div className="flex-1 grid md:grid-cols-2 gap-6 min-h-0">
-          <section className={`flex-col bg-card/30 rounded-2xl border border-border p-5 min-h-0 ${activeTab === "repertoire" ? "flex" : "hidden md:flex"}`}>
+        <div className="flex-1 grid md:grid-cols-[2fr_3fr] gap-4 min-h-0">
+          <section className={`flex-col bg-card/30 rounded-xl border border-border p-3 min-h-0 ${activeTab === "repertoire" ? "flex" : "hidden md:flex"}`}>
             <div className="flex items-center justify-between mb-4 shrink-0">
               <h3 className="text-xl font-bold text-foreground">Meu Repertório</h3>
               <span className="text-sm text-muted-foreground">
