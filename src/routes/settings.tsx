@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Monitor, Moon, Info, Mail, Heart } from "lucide-react";
+import { Monitor, Moon, Info, Mail } from "lucide-react";
 import { getDarkModePreference, setDarkModePreference } from "@/lib/preferences";
 
 export const Route = createFileRoute("/settings")({
@@ -140,16 +140,17 @@ function SettingsPage() {
             <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
               Desenvolvido pela{" "}
               <span className="text-foreground font-medium">ATOM Product Lab</span>{" "}
-              para atender as necessidades reais de palco da banda{" "}
-              <span className="text-foreground font-medium">Barbie Kills</span>.
+              para atender a{" "}
+              <a
+                href="https://www.bandabarbiekills.com.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground font-medium underline underline-offset-2 hover:opacity-70 transition-opacity"
+              >
+                Banda Barbie Kills
+              </a>
+              .
             </p>
-
-            {/* Feito com amor */}
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span>Feito com</span>
-              <Heart className="h-3 w-3 fill-current text-red-400" />
-              <span>em Campinas, Brasil</span>
-            </div>
 
             {/* Contato */}
             <a
