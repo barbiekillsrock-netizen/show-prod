@@ -190,9 +190,9 @@ function RepertoireItem({ song, inSetlist }: { song: Song; inSetlist: boolean })
     >
       <GripVertical className="h-5 w-5 text-muted-foreground shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-base font-medium text-foreground truncate">{song.title}</p>
+        <p className="text-sm font-medium text-foreground truncate">{song.title}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+          <p className="text-xs text-muted-foreground truncate">{song.artist}</p>
           {song.genre && (
             <span className="inline-flex items-center px-1.5 h-4 rounded text-[10px] font-medium bg-secondary text-muted-foreground shrink-0">
               {song.genre}
@@ -242,10 +242,8 @@ function SetlistItem({
         <GripVertical className="h-5 w-5 text-muted-foreground" />
       </button>
       <div className="flex-1 min-w-0">
-        <p className="text-base font-semibold text-foreground truncate">
-          {song.title}
-        </p>
-        <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+        <p className="text-sm font-semibold text-foreground truncate">{song.title}</p>
+        <p className="text-xs text-muted-foreground truncate">{song.artist}</p>
       </div>
       {song.key && (
         <span className="inline-flex items-center justify-center min-w-[44px] h-8 px-2 rounded bg-primary text-primary-foreground text-sm font-bold">
@@ -534,10 +532,10 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
           </button>
         </div>
 
-        <div className="flex-1 grid md:grid-cols-[2fr_3fr] gap-4 min-h-0">
-          <section className={`flex-col bg-card/30 rounded-xl border border-border p-3 min-h-0 ${activeTab === "repertoire" ? "flex" : "hidden md:flex"}`}>
+        <div className="flex-1 grid md:grid-cols-[2fr_3fr] gap-4 min-h-0 overflow-hidden">
+          <section className={`flex-col bg-card/30 rounded-xl border border-border p-3 min-h-0 overflow-hidden ${activeTab === "repertoire" ? "flex" : "hidden md:flex"}`}>
             <div className="flex items-center justify-between mb-4 shrink-0">
-              <h3 className="text-xl font-bold text-foreground">Meu Repertório</h3>
+              <h3 className="text-base font-bold text-foreground">Meu Repertório</h3>
               <span className="text-sm text-muted-foreground">
                 {filtered.length} músicas
               </span>
@@ -605,9 +603,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
           </section>
 
           <section className="flex flex-col bg-card/30 rounded-2xl border border-border p-5 min-h-0">
-            <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-2 shrink-0">
-              Roteiro do Show
-            </h4>
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 shrink-0">Roteiro do Show</h4>
             <SetlistDropArea
               setlist={setlist}
               onRemove={removeFromSetlist}
