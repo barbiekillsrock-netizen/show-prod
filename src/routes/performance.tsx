@@ -379,69 +379,65 @@ function PerformancePage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 bg-black text-white select-none" data-performance>
-      {/* Top bar */}
+      {/* Top bar — linha única compacta */}
       <div className="absolute top-0 inset-x-0 z-30 flex flex-col pointer-events-none">
-        {/* Linha 1: Sair + Cronômetro + Título */}
-        <div className="flex items-center justify-between px-3 py-2">
-          <div className="pointer-events-auto flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate({ to: exitTo })}
-              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5" />
-              <span className="text-sm font-medium">Sair</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setTimerRunning((r) => !r)}
-              className="inline-flex items-center gap-1.5 h-11 px-3 rounded-lg bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors tabular-nums"
-              title={timerRunning ? "Pausar cronômetro" : "Retomar cronômetro"}
-            >
-              {timerRunning ? <Pause className="h-3.5 w-3.5 shrink-0" /> : <Play className="h-3.5 w-3.5 shrink-0 text-[#F5A623]" />}
-              <span className="text-sm font-mono">{formatTime(elapsed)}</span>
-            </button>
-          </div>
+        {/* Linha 1: tudo em h-9 compacto */}
+        <div className="flex items-center gap-1.5 px-2 py-1.5 pointer-events-auto">
+          {/* Sair */}
+          <button
+            type="button"
+            onClick={() => navigate({ to: exitTo })}
+            className="inline-flex items-center gap-1 h-8 px-2.5 rounded-md bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white hover:bg-black/80 transition-colors shrink-0"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="text-xs font-medium">Sair</span>
+          </button>
 
-          <div className="pointer-events-auto px-3 py-2 rounded-lg bg-black/60 backdrop-blur border border-white/10 flex items-center gap-2">
+          {/* Cronômetro */}
+          <button
+            type="button"
+            onClick={() => setTimerRunning((r) => !r)}
+            className="inline-flex items-center gap-1 h-8 px-2.5 rounded-md bg-black/60 backdrop-blur border border-white/10 text-white/80 hover:text-white transition-colors tabular-nums shrink-0"
+          >
+            {timerRunning ? <Pause className="h-3 w-3 shrink-0" /> : <Play className="h-3 w-3 shrink-0 text-[#F5A623]" />}
+            <span className="text-xs font-mono">{formatTime(elapsed)}</span>
+          </button>
+
+          {/* Título + tom + posição */}
+          <div className="flex items-center gap-1.5 flex-1 min-w-0 h-8 px-2.5 rounded-md bg-black/60 backdrop-blur border border-white/10">
             {activeSong.key && (
-              <span className="inline-flex items-center justify-center px-2 h-6 rounded bg-foreground text-background text-xs font-bold shrink-0">
+              <span className="inline-flex items-center justify-center px-1.5 h-5 rounded bg-foreground text-background text-[10px] font-bold shrink-0">
                 {activeSong.key}
               </span>
             )}
             {activeSong.bpm && (
-              <span className="inline-flex items-center justify-center px-2 h-6 rounded bg-[#2A2A2A] text-[#A3A3A3] text-xs font-medium shrink-0">
-                {activeSong.bpm} BPM
-              </span>
+              <span className="text-[10px] text-white/40 shrink-0">{activeSong.bpm}♩</span>
             )}
-            <span className="text-sm font-medium text-white truncate max-w-[180px]">{activeSong.title}</span>
-            <span className="text-xs text-white/40 shrink-0">{activeIdx + 1}/{setlist.length}</span>
+            <span className="text-xs font-medium text-white truncate">{activeSong.title}</span>
+            <span className="text-[10px] text-white/30 shrink-0 ml-auto">{activeIdx + 1}/{setlist.length}</span>
           </div>
 
-          <div className="pointer-events-auto flex items-center gap-2">
-            {/* Dark Mode toggle */}
-            <button
-              type="button"
-              onClick={() => setDarkMode((d) => !d)}
-              className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
-                darkMode ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623]" : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
-              }`}
-              title={darkMode ? "Modo escuro ON" : "Modo escuro OFF"}
-            >
-              {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </button>
-          </div>
+          {/* Dark mode */}
+          <button
+            type="button"
+            onClick={() => setDarkMode((d) => !d)}
+            className={`inline-flex items-center justify-center h-8 w-8 rounded-md border backdrop-blur transition-colors shrink-0 ${
+              darkMode ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623]" : "bg-black/60 border-white/10 text-white/70 hover:text-white"
+            }`}
+          >
+            {darkMode ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+          </button>
         </div>
 
-        {/* Linha 2: Ferramentas */}
-        <div className="flex items-center gap-2 px-3 pb-2 overflow-x-auto scrollbar-none pointer-events-auto">
+        {/* Linha 2: Ferramentas — compacta */}
+        <div className="flex items-center gap-1.5 px-2 pb-1.5 overflow-x-auto scrollbar-none pointer-events-auto">
           {/* Controles de rolagem — só no modo lyrics */}
           {hasLyrics && (
             <>
               <button
                 type="button"
                 onClick={() => setAutoScroll(a => !a)}
-                className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-lg border backdrop-blur transition-colors shrink-0 ${
+                className={`inline-flex items-center gap-1 h-8 px-2.5 rounded-md border backdrop-blur transition-colors shrink-0 ${
                   autoScroll ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623] font-semibold" : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
                 }`}
                 title={autoScroll ? "Pausar rolagem" : "Iniciar rolagem automática"}
@@ -452,14 +448,14 @@ function PerformancePage() {
               <button
                 type="button"
                 onClick={() => setScrollSpeed(s => Math.max(1, s - 1))}
-                className="inline-flex items-center justify-center h-11 w-9 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 shrink-0"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white shrink-0"
                 title="Mais lento"
               ><ChevronsDown className="h-4 w-4" /></button>
               <span className="text-xs text-white/50 w-4 text-center shrink-0">{scrollSpeed}</span>
               <button
                 type="button"
                 onClick={() => setScrollSpeed(s => Math.min(10, s + 1))}
-                className="inline-flex items-center justify-center h-11 w-9 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 shrink-0"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white shrink-0"
                 title="Mais rápido"
               ><ChevronsUp className="h-4 w-4" /></button>
             </>
@@ -469,17 +465,17 @@ function PerformancePage() {
           {hasLyrics && (
             <>
               <button type="button" onClick={() => setLyricsFontSize(s => Math.max(12, s - 2))}
-                className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 text-lg font-bold shrink-0"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white font-bold shrink-0"
                 title="Diminuir fonte">A-</button>
               <button type="button" onClick={() => setLyricsFontSize(s => Math.min(40, s + 2))}
-                className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white hover:bg-black/80 text-lg font-bold shrink-0"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-white font-bold shrink-0"
                 title="Aumentar fonte">A+</button>
             </>
           )}
 
           {/* Caneta */}
           <button type="button" onClick={() => setTool((t) => (t === "pen" ? null : "pen"))}
-            className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
+            className={`inline-flex items-center justify-center h-8 w-8 rounded-md border backdrop-blur transition-colors ${
               tool === "pen" ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623]" : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`} aria-label="Caneta">
             <Pen className="h-5 w-5" />
@@ -488,7 +484,7 @@ function PerformancePage() {
           {tool !== null && (
             <button type="button"
               onClick={() => setColor((c) => (c === "#F5A623" ? "#FF0055" : "#F5A623"))}
-              className="inline-flex items-center justify-center h-11 w-11 rounded-lg border border-white/10 bg-black/60 backdrop-blur hover:bg-black/80 relative"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/10 bg-black/60 backdrop-blur hover:bg-black/80 relative"
               aria-label="Trocar cor">
               <Palette className="h-5 w-5 text-white/70" />
               <span className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-black" style={{ backgroundColor: color }} />
@@ -497,7 +493,7 @@ function PerformancePage() {
 
           {/* Borracha */}
           <button type="button" onClick={() => setTool((t) => (t === "eraser" ? null : "eraser"))}
-            className={`inline-flex items-center justify-center h-11 w-11 rounded-lg border backdrop-blur transition-colors ${
+            className={`inline-flex items-center justify-center h-8 w-8 rounded-md border backdrop-blur transition-colors ${
               tool === "eraser" ? "bg-[#F5A623] text-[#0C0B09] border-[#F5A623]" : "bg-black/60 border-white/10 text-white/70 hover:text-white hover:bg-black/80"
             }`} aria-label="Borracha">
             <Eraser className="h-5 w-5" />
@@ -505,7 +501,7 @@ function PerformancePage() {
 
           {/* Limpar */}
           <button type="button" onClick={clearStrokes}
-            className="inline-flex items-center gap-2 h-11 px-3 rounded-lg border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/40 transition-colors"
+            className="inline-flex items-center gap-1 h-8 px-2.5 rounded-md border border-white/10 bg-black/60 backdrop-blur text-white/70 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/40 transition-colors"
             title="Limpar Traços">
             <Trash2 className="h-4 w-4" />
             <span className="text-sm font-medium">Limpar</span>
