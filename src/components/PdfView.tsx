@@ -145,8 +145,8 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
             "flex-shrink-0 flex items-center justify-center overflow-y-auto overflow-x-hidden";
           slide.style.width = `${width}px`;
           slide.style.height = `${height}px`;
-          slide.style.scrollSnapAlign = "start";
-          slide.style.scrollSnapStop = "always";
+          // scrollSnapAlign removido — navegação 100% via JS
+
 
           const canvas = document.createElement("canvas");
           canvas.className = "block bg-white";
@@ -207,7 +207,7 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
     <div
       ref={containerRef}
       aria-label="PDF da música"
-      className="absolute inset-0 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory pdf-scroll-x"
+      className="absolute inset-0 flex overflow-x-hidden overflow-y-hidden pdf-scroll-x"
       style={{ scrollbarWidth: "none", touchAction: "pan-x", scrollBehavior: "auto" }}
     />
   );
