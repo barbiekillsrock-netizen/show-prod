@@ -85,7 +85,20 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
       onPagesChange({ current, total });
     };
     el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+
+    // Após swipe, encaixa na página mais próxima (sem animação)
+    function onTouchEnd() {
+      const cw = el.clientWidth;
+      if (cw <= 0) return;
+      const nearest = Math.round(el.scrollLeft / cw);
+      el.scrollTo({ left: nearest * cw, behavior: "instant" });
+    }
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
   }, [onPagesChange]);
 
   useEffect(() => {
@@ -207,7 +220,8 @@ const PdfView = forwardRef<PdfViewHandle, Props>(function PdfView(
     <div
       ref={containerRef}
       aria-label="PDF da música"
-      className="absolute inset-0 flex overflow-x-hidden overflow-y-hidden pdf-scroll-x"
+      className="absolute inset-0 flex overflow-x-auto overflow-y-hidden pdf-scroll-x"
+          style={{ scrollbarWidth: "none", touchAction: "pan-x", scrollBehavior: "auto", scrollSnapType: "none" }}
       style={{ scrollbarWidth: "none", touchAction: "pan-x", scrollBehavior: "auto" }}
     />
   );
