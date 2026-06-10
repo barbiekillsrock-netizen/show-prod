@@ -253,7 +253,7 @@ function SetlistItem({
       <button
         type="button"
         onClick={() => onRemove(song.id)}
-        className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition p-2 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
+        className="opacity-60 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition p-2 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive shrink-0"
         aria-label="Remover do setlist"
       >
         <X className="h-4 w-4" />
@@ -602,7 +602,7 @@ function SetlistEditor({ setlist: meta }: { setlist: Setlist }) {
             </div>
           </section>
 
-          <section className="flex flex-col bg-card/30 rounded-2xl border border-border p-5 min-h-0">
+          <section className={`flex-col bg-card/30 rounded-xl border border-border p-3 min-h-0 overflow-hidden ${activeTab === "setlist" ? "flex" : "hidden md:flex"}`}>
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 shrink-0">Roteiro do Show</h4>
             <SetlistDropArea
               setlist={setlist}
