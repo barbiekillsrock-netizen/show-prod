@@ -15,6 +15,7 @@ function SongEditor({ song, onBack }: { song: Song | null; onBack: () => void })
   const [key, setKey] = useState(song?.key ?? "");
   const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
   const [lyrics, setLyrics] = useState(song?.lyrics ?? "");
+  const [keyError, setKeyError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -23,11 +24,15 @@ function SongEditor({ song, onBack }: { song: Song | null; onBack: () => void })
     textareaRef.current?.focus();
   }, []);
 
-  const canSave = title.trim().length > 0;
+  const canSave = title.trim().length > 0 && !keyError;
 
   async function handleSave() {
     if (!canSave) return;
     setSaving(true);
+    if (key.trim() && !isValidKey(key)) {
+      setKeyError(true);
+      return;
+    }
     const data = {
       title: title.trim(),
       artist: artist.trim(),
@@ -76,10 +81,22 @@ function SongEditor({ song, onBack }: { song: Song | null; onBack: () => void })
           <input
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            onBlur={() => key.trim() && setKey(normalizeKey(key))}
+            onBlur={() => {
+              if (key.trim()) {
+                if (isValidKey(key)) {
+                  setKey(normalizeKey(key));
+                  setKeyError(false);
+                } else {
+                  setKeyError(true);
+                }
+              } else {
+                setKeyError(false);
+              }
+            }}
+            onChange={(e) => { setKey(e.target.value); setKeyError(false); }}
             placeholder="Tom"
             maxLength={4}
-            className="w-14 h-8 px-2 text-center text-sm font-bold rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-14 h-8 px-2 text-center text-sm font-bold rounded-lg border bg-background text-foreground focus:outline-none focus:ring-2 ${keyError ? "border-red-500 focus:ring-red-500" : "border-border focus:ring-primary"}`}
           />
           <input
             value={bpm}
