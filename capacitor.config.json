@@ -4,7 +4,7 @@
   "webDir": "dist/client",
   "android": {
     "allowMixedContent": false,
-    "captureInput": true,
+    "captureInput": false,
     "webContentsDebuggingEnabled": false
   },
   "plugins": {
