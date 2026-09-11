@@ -29,7 +29,7 @@ if errorlevel 1 (
 
 echo.
 echo [4/4] Gerando APK...
-cd android
+cd /d D:\show-prod\android
 set JAVA_HOME=C:\Users\Mari\.jdks\jbr-21.0.11
 set PATH=%JAVA_HOME%\bin;%PATH%
 call gradlew.bat assembleDebug
