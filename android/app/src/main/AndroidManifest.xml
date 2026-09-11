@@ -16,7 +16,8 @@
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
             android:exported="true"
-            android:windowSoftInputMode="stateVisible|adjustResize">
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:hardwareAccelerated="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

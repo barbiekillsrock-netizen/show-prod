@@ -3,15 +3,14 @@
   "appName": "ShowProd",
   "webDir": "dist/client",
   "android": {
-    "allowMixedContent": false,
+    "allowMixedContent": true,
     "captureInput": true,
     "webContentsDebuggingEnabled": false,
-    "loggingBehavior": "none",
-    "useLegacyBridge": false
+    "appendUserAgent": "ShowProd/1.0"
   },
   "plugins": {
     "Keyboard": {
-      "resize": "native",
+      "resize": "body",
       "resizeOnFullScreen": true
     }
   }
