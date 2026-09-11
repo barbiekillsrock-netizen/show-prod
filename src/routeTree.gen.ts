@@ -73,6 +73,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EditorRoute: typeof EditorRoute
   PerformanceRoute: typeof PerformanceRoute
   SetlistsRoute: typeof SetlistsRoute
   SettingsRoute: typeof SettingsRoute
@@ -113,6 +114,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EditorRoute: EditorRoute,
   PerformanceRoute: PerformanceRoute,
   SetlistsRoute: SetlistsRoute,
   SettingsRoute: SettingsRoute,
