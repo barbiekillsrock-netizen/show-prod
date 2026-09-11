@@ -107,3 +107,13 @@
   /* Touch devices (mobile/tablet) — hide arrows, use swipe */
   .stage-arrow { display: none !important; }
 }
+
+/* Fix: inputs e textareas precisam de user-select: text no Android WebView */
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+  touch-action: auto !important;
+}
