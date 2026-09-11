@@ -3,10 +3,9 @@
   "appName": "ShowProd",
   "webDir": "dist/client",
   "android": {
-    "allowMixedContent": true,
+    "allowMixedContent": false,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false,
-    "appendUserAgent": "ShowProd/1.0"
+    "webContentsDebuggingEnabled": false
   },
   "plugins": {
     "Keyboard": {
