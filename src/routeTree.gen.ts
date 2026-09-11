@@ -13,6 +13,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SetlistsRouteImport } from './routes/setlists'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as EditorRouteImport } from './routes/editor'
+import { Route as SongsNewRouteImport } from './routes/songs.new'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -30,6 +31,11 @@ const PerformanceRoute = PerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SongsNewRoute = SongsNewRouteImport.update({
+  id: '/songs/new',
+  path: '/songs/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EditorRoute = EditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/songs/new': typeof SongsNewRoute
   '/performance': typeof PerformanceRoute
   '/setlists': typeof SetlistsRoute
   '/settings': typeof SettingsRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/songs/new': typeof SongsNewRoute
   '/performance': typeof PerformanceRoute
   '/setlists': typeof SetlistsRoute
   '/settings': typeof SettingsRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/songs/new': typeof SongsNewRoute
   '/performance': typeof PerformanceRoute
   '/setlists': typeof SetlistsRoute
   '/settings': typeof SettingsRoute
@@ -74,6 +83,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EditorRoute: typeof EditorRoute
+  SongsNewRoute: typeof SongsNewRoute
   PerformanceRoute: typeof PerformanceRoute
   SetlistsRoute: typeof SetlistsRoute
   SettingsRoute: typeof SettingsRoute
@@ -115,6 +125,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EditorRoute: EditorRoute,
+  SongsNewRoute: SongsNewRoute,
   PerformanceRoute: PerformanceRoute,
   SetlistsRoute: SetlistsRoute,
   SettingsRoute: SettingsRoute,
