@@ -1,0 +1,14 @@
+{
+  "appId": "com.atomproductlab.showprod",
+  "appName": "ShowProd",
+  "webDir": "dist/client",
+  "server": {
+    "url": "https://show-prod.barbiekillsrock.workers.dev",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}
