@@ -1,23 +1,34 @@
-// Inicializa o plugin de teclado do Capacitor
-// Garante que inputs recebem foco corretamente no Android WebView
-
 import { Capacitor } from "@capacitor/core";
 
 export function initKeyboard() {
   if (!Capacitor.isNativePlatform()) return;
 
-  // Foca o elemento ativo quando o teclado fecha
-  // Isso corrige o bug de perda de foco no Android WebView
-  document.addEventListener("click", (e) => {
+  // Fix global para inputs no Android WebView
+  // O WebView perde foco após interações com elementos nativos
+  document.addEventListener("touchend", (e) => {
     const target = e.target as HTMLElement;
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "TEXTAREA" ||
-      target.tagName === "SELECT"
-    ) {
+    const isInput = 
+      target.tagName === "INPUT" || 
+      target.tagName === "TEXTAREA";
+    
+    if (isInput) {
+      e.preventDefault();
+      const input = target as HTMLInputElement;
+      
+      // Foca e posiciona cursor no final
       setTimeout(() => {
-        (target as HTMLInputElement).focus();
-      }, 100);
+        input.focus();
+        const len = input.value.length;
+        input.setSelectionRange(len, len);
+      }, 50);
+      
+      setTimeout(() => {
+        input.focus();
+      }, 150);
+      
+      setTimeout(() => {
+        input.focus();
+      }, 300);
     }
-  });
+  }, { passive: false });
 }
