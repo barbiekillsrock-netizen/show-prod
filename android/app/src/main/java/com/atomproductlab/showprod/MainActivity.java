@@ -13,7 +13,6 @@ public class MainActivity extends BridgeActivity {
         WebView webView = getBridge().getWebView();
         WebSettings settings = webView.getSettings();
 
-        // Força comportamento idêntico ao Chrome
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
@@ -22,11 +21,5 @@ public class MainActivity extends BridgeActivity {
         settings.setDisplayZoomControls(false);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " ShowProd/1.0");
-
-        // Foco no WebView
-        webView.setFocusable(true);
-        webView.setFocusableInTouchMode(true);
-        webView.requestFocus();
     }
 }
