@@ -4,6 +4,10 @@ import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getRouter } from "./router.spa";
 import "./styles.css";
+import { initKeyboard } from "./lib/keyboard";
+
+// Inicializa teclado para Android
+initKeyboard();
 
 const queryClient = new QueryClient();
 const router = getRouter();
