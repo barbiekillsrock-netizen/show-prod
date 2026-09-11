@@ -12,15 +12,13 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        // Garante que o WebView aceita input de teclado
         WebView webView = getBridge().getWebView();
         if (webView != null) {
             WebSettings settings = webView.getSettings();
             settings.setJavaScriptEnabled(true);
             settings.setDomStorageEnabled(true);
-            settings.setDatabaseEnabled(true);
             webView.setFocusable(true);
             webView.setFocusableInTouchMode(true);
             webView.requestFocus();
