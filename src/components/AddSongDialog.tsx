@@ -28,6 +28,7 @@ export function AddSongDialog({
   const [bpm, setBpm] = useState(song?.bpm ? String(song.bpm) : "");
   const [customGenre, setCustomGenre] = useState(isCustomGenre ? (song?.genre ?? "") : "");
   const [dragOver, setDragOver] = useState(false);
+  const [genreOpen, setGenreOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -209,24 +210,44 @@ export function AddSongDialog({
             />
           </div>
 
-          {/* Estilo */}
+          {/* Estilo — dropdown customizado (sem select nativo que rouba foco no Android) */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Estilo{" "}
               <span className="text-muted-foreground font-normal">(opcional)</span>
             </label>
             <div className="relative">
-              <select
-                value={genre}
-                onChange={(e) => { setGenre(e.target.value); if (e.target.value !== "Outro") setCustomGenre(""); }}
-                className="w-full h-12 pl-4 pr-10 rounded-lg bg-background border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+              <button
+                type="button"
+                onClick={() => setGenreOpen(!genreOpen)}
+                className="w-full h-12 pl-4 pr-10 rounded-lg bg-background border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-left flex items-center justify-between"
               >
-                <option value="">Selecione um estilo...</option>
-                {GENRES.map((g) => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <span className={genre ? "text-foreground" : "text-muted-foreground"}>
+                  {genre || "Selecione um estilo..."}
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+              </button>
+              {genreOpen && (
+                <div className="absolute z-50 top-full mt-1 w-full bg-card border border-border rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={() => { setGenre(""); setGenreOpen(false); }}
+                    className="w-full text-left px-4 py-3 text-base text-muted-foreground hover:bg-muted"
+                  >
+                    Selecione um estilo...
+                  </button>
+                  {GENRES.map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => { setGenre(g); if (g !== "Outro") setCustomGenre(""); setGenreOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-base hover:bg-muted ${genre === g ? "text-primary font-semibold" : "text-foreground"}`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {genre === "Outro" && (
               <input
