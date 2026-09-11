@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState } from "react";
 import { X, FileText, Upload, Trash2, ChevronDown } from "lucide-react";
 import { songsStore, VALID_KEYS, GENRES, normalizeKey, isValidKey, type Song } from "@/data/songs";
 
@@ -93,8 +93,7 @@ export function AddSongDialog({
     }
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleSubmit() {
     if (!canSubmit) return;
     if (isEditing && song) {
       await songsStore.update(
@@ -183,14 +182,13 @@ export function AddSongDialog({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           {/* Título */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Título
             </label>
             <input
-              autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder=""
@@ -232,7 +230,6 @@ export function AddSongDialog({
             </div>
             {genre === "Outro" && (
               <input
-                autoFocus
                 value={customGenre}
                 onChange={(e) => setCustomGenre(e.target.value)}
                 placeholder="Digite o estilo..."
@@ -343,7 +340,6 @@ export function AddSongDialog({
                   placeholder={'[G]  [D]\nWish you were here\n[Em] [C]\nWe\'re just two lost souls...'}
                   className="w-full px-4 py-3 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono resize-none leading-7"
                   style={{ minHeight: "380px" }}
-                  autoFocus={inputMode === "text"}
                 />
                 {lyrics.length > 0 && (
                   <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-md border border-border">
@@ -431,14 +427,15 @@ export function AddSongDialog({
               Cancelar
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={!canSubmit}
               className="h-12 px-6 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]"
             >
               {isEditing ? "Salvar" : "Adicionar"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
     </>
